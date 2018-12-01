@@ -38,7 +38,7 @@ public class ManageSellerController {
         }
     }
 
-    @PostMapping("/request/deal")
+    @PutMapping("/request/deal")
     public ResponseEntity<Object> dealRequest(@RequestBody Map<String, Object> map) {
         Long requestId = Long.parseLong(map.get("id").toString());
         Integer status = Integer.parseInt(map.get("status").toString());
