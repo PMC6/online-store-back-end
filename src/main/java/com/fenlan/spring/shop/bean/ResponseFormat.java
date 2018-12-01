@@ -1,8 +1,5 @@
 package com.fenlan.spring.shop.bean;
 
-import com.alibaba.fastjson.JSONObject;
-import org.springframework.http.HttpStatus;
-
 import java.util.Date;
 
 public class ResponseFormat {
