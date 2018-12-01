@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +27,6 @@ public class IndexController {
 
     @GetMapping("")
     public ResponseEntity<ResponseFormat> index(Authentication auth) {
-        System.out.println("------------------------------------");
         return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                 .error(null)
                 .message("login success")
@@ -43,7 +41,6 @@ public class IndexController {
         try {
             Authentication auth = manager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(auth);
-            System.out.println("fuck");
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("login success")
