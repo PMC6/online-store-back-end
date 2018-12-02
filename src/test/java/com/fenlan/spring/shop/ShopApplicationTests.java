@@ -1,12 +1,15 @@
 package com.fenlan.spring.shop;
 
 import com.fenlan.spring.shop.DAO.RequestDAO;
+import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.Request;
+import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.SysRole;
 import com.fenlan.spring.shop.bean.User;
 import com.fenlan.spring.shop.service.RequestService;
+import com.fenlan.spring.shop.service.ShopService;
 import com.fenlan.spring.shop.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +31,8 @@ public class ShopApplicationTests {
     RequestDAO requestDAO;
     @Autowired
     RequestService requestService;
+    @Autowired
+    ShopService shopService;
 
     @Test
     public void contextLoads() {
@@ -73,4 +78,32 @@ public class ShopApplicationTests {
         registerAdmin();
     }
 
+    @Test
+    public void addShop(){
+        Shop shop = new Shop();
+        shop.setEmail("1412328318@qq.com");
+        shop.setImage("a url");
+        shop.setName("hello shop");
+        shop.setInfo("a shop");
+        shop.setTelephone("18702953778");
+        long id = 1;
+        shop.setUserId(id);
+        shopService.saveShop(shop);
+    }
+
+    @Test
+    public void updateShop(){
+        Shop shop = shopService.findByShopId(1);
+        Shop shop1 = shopService.findByShopId(1);
+        shop1.setTelephone("1234560");
+        shopService.update(shop, shop1);
+    }
+
+    @Test
+    public void findShop(){
+        Shop shop = shopService.findByShopId(2);
+        System.out.println("shop name: " + shop.getName());
+        shop = shopService.findByOwnerName("fan");
+        System.out.println("fan's shop name: " + shop.getName());
+    }
 }
