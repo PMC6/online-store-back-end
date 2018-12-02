@@ -93,17 +93,31 @@ public class ShopApplicationTests {
 
     @Test
     public void updateShop(){
-        Shop shop = shopService.findByShopId(1);
-        Shop shop1 = shopService.findByShopId(1);
+        Shop shop = null;
+        try {
+            shop = shopService.findByShopId(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Shop shop1 = null;
+        try {
+            shop1 = shopService.findByShopId(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         shop1.setTelephone("1234560");
         shopService.update(shop, shop1);
     }
 
     @Test
     public void findShop(){
-        Shop shop = shopService.findByShopId(2);
-        System.out.println("shop name: " + shop.getName());
-        shop = shopService.findByOwnerName("fan");
-        System.out.println("fan's shop name: " + shop.getName());
+        try {
+            Shop shop = shopService.findByShopId(2);
+            System.out.println("shop name: " + shop.getName());
+            shop = shopService.findByOwnerName("fan");
+            System.out.println("fan's shop name: " + shop.getName());
+        }catch (Exception e){
+
+        }
     }
 }
