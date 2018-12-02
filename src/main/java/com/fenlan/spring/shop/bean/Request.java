@@ -10,7 +10,8 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String shopName;
-    private Long userId;
+    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    private User user;
     private RequestStatus status;
     private String image;
     private String info;
@@ -27,14 +28,6 @@ public class Request {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getImage() {
@@ -99,5 +92,13 @@ public class Request {
 
     public void setStatus(RequestStatus status) {
         this.status = status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
