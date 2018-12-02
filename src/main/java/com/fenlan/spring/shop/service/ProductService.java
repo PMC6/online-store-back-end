@@ -15,7 +15,7 @@ public class ProductService {
     public Product add(Product newProduct) throws Exception {
         try {
             if (null != productDAO.findByShopIdAndName(newProduct.getShopId(), newProduct.getName()))
-                throw new Exception("商品已在店铺中");
+                throw new Exception("product has been added in this shop");
             return productDAO.save(newProduct);
         } catch (Exception e) {
             throw e;
