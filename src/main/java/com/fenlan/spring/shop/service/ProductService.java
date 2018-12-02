@@ -44,9 +44,12 @@ public class ProductService {
      * @param category
      * @return
      */
-    public List<Product> findByCategory(String category){
+    public List<Product> findByCategory(String category) throws Exception{
         Category category1 = categoryDAO.findByName(category);
-        return productDAO.findByCategoryId(category1.getId());
+        if(null == category1) throw new Exception("null");
+        List<Product> productList = productDAO.findByCategoryId(category1.getId());
+        if (productList == null) throw new Exception("null");
+        return productList;
     }
 
     /**
@@ -55,9 +58,12 @@ public class ProductService {
      * @param shopName
      * @return
      */
-    public List<Product> findByShopName(String shopName){
+    public List<Product> findByShopName(String shopName) throws Exception{
         Shop shop = shopDAO.findByName(shopName);
-        return productDAO.findByShopId(shop.getId());
+        if (shop == null) throw new Exception("null");
+        List<Product> productList = productDAO.findByShopId(shop.getId());
+        if (productList == null) throw new Exception("null");
+        return productList;
     }
 
     /**
@@ -66,8 +72,10 @@ public class ProductService {
      * @param productName
      * @return
      */
-    public List<Product> findByProductName(String productName){
-        return productDAO.findByName(productName);
+    public List<Product> findByProductName(String productName) throws Exception{
+        List<Product> productList = productDAO.findByName(productName);
+        if (productList == null) throw new Exception("null");
+        return productList;
     }
 
     /**

@@ -14,6 +14,8 @@ import com.fenlan.spring.shop.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class ShopService {
@@ -27,6 +29,12 @@ public class ShopService {
      */
     public void saveShop(Shop shop){
         shopDAO.save(shop);
+    }
+
+    public List<Shop> findAllShop() throws Exception{
+        List<Shop> shopList = shopDAO.findAll();
+        if (shopList == null) throw new Exception("null");
+        return shopList;
     }
 
     /**
@@ -44,8 +52,10 @@ public class ShopService {
      * @param id shop id
      * @return
      */
-    public Shop findByShopId(long id){
-        return shopDAO.findById(id);
+    public Shop findByShopId(long id) throws Exception{
+        Shop shop = shopDAO.findById(id);
+        if (shop == null) throw new Exception("null");
+        return shop;
     }
 
     /**
@@ -53,24 +63,23 @@ public class ShopService {
      * @param sellerName: seller name
      * @return shop
      */
-    public Shop findByOwnerName(String sellerName){
-        if(sellerName == null){
-            return null;
-        }
+    public Shop findByOwnerName(String sellerName) throws Exception{
         User user = userDAO.findByUsername(sellerName);
         if (user == null){
-            return null;
+            throw new Exception("null");
         }
-        return  shopDAO.findByUserId(user.getId());
+        Shop shop = shopDAO.findByUserId(user.getId());
+        if (shop == null) throw new Exception("null");
+        return shop;
     }
 
     /**
      * 由卖家名删除商店信息
      * @param sellerName
      */
-    public void deleteShopByOwnerName(String sellerName){
+    public void deleteShopByOwnerName(String sellerName) throws Exception{
         User user = userDAO.findByUsername(sellerName);
-        if (user == null) return;
+        if (user == null) throw new Exception("null");
         Shop shop = shopDAO.findByUserId(user.getId());
         new ProductService().deleteProductWithShop(shop);
         shopDAO.delete(shop);
