@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ShopDAO extends JpaRepository<Shop, Long> {
     Shop findByName(String name);
+    Shop findByUserId(Long id);
 }
