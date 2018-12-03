@@ -24,7 +24,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         User user = userDAO.findByUsername(s);
         if (user == null) {
-            throw new UsernameNotFoundException("用户名不存在");
+            throw new UsernameNotFoundException("don't have this username");
         }
         System.out.println("s:"+s);
         System.out.println("username:"+user.getUsername()+";password:"+user.getPassword());
@@ -50,5 +50,19 @@ public class UserService implements UserDetailsService {
 
     public User findByName(String username) {
         return userDAO.findByUsername(username);
+    }
+
+    public User findByNameAndRole(String username, String role) throws Exception {
+        if (sysRoleDAO.existsByName(role))
+            return checkRole(findByName(username), sysRoleDAO.findByName(role));
+        else
+            throw new Exception("system role don't contain " + role);
+    }
+
+    public User checkRole(User user, SysRole role) throws Exception {
+        if (user.getRoles().contains(role))
+            return user;
+        else
+            throw new Exception(user.getUsername() + " " + "is not " + role.getName());
     }
 }

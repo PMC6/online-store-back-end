@@ -11,7 +11,8 @@ public class Shop {
     private Long id;
     @Column(unique = true)
     private String name;
-    private Long userId;
+    @OneToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    private User user;
     private String info;
     private String image;
     private String email;
@@ -35,14 +36,6 @@ public class Shop {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getInfo() {
@@ -91,5 +84,13 @@ public class Shop {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

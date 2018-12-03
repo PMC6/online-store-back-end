@@ -6,10 +6,12 @@ import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,13 +24,29 @@ public class RequestService {
     UserDAO userDAO;
     @Autowired
     SysRoleDAO sysRoleDAO;
+    @Autowired
+    ShopService shopService;
 
-    public List<Request> list() throws Exception {
-        List<Request> notDeal = requestDAO.findAllByStatus(RequestStatus.PROCESS);
-        if (notDeal.size() == 0)
-            throw new Exception("没有未处理的申请");
+    public long numOfStatus(int status) throws Exception {
+        switch (status) {
+            case 0 : return requestDAO.countByStatus(RequestStatus.PROCESS);
+            case 1 : return requestDAO.countByStatus(RequestStatus.APPROVE);
+            case 2 : return requestDAO.countByStatus(RequestStatus.REJECT);
+            default: throw new Exception("wrong status param");
+        }
+    }
+
+    public List<Request> list(Integer status, int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Request> list;
+        if (null == status)
+            list = requestDAO.findAll(pageable).getContent();
         else
-            return notDeal;
+            list = requestDAO.findAllByStatus(RequestStatus.getByCode(status), pageable);
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return list;
     }
 
     public Request add(Request request) throws Exception {
@@ -36,10 +54,10 @@ public class RequestService {
             if (null == request.getShopName())
                 throw new Exception("missing 'shopName'");
             else if (null != shopDAO.findByName(request.getShopName()))
-                throw new Exception("店铺已存在");
+                throw new Exception("shop name is exist");
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             request.setStatus(RequestStatus.PROCESS);
-            request.setUserId(user.getId());
+            request.setUser(user);
             return requestDAO.save(request);
         } catch (Exception e) {
             throw e;
@@ -51,30 +69,19 @@ public class RequestService {
             Request request = requestDAO.getOne(id);
             request.setStatus(RequestStatus.values()[status]);
             // 批准申请
-            if (status == 1 && null == shopDAO.findByName(request.getShopName())) {
+            if (status == 1 && null == shopService.findByUserId(request.getUser().getId())) {
                 Shop newShop = new Shop();
                 newShop.setName(request.getShopName());
                 newShop.setEmail(request.getEmail());
                 newShop.setImage(request.getImage());
                 newShop.setInfo(request.getInfo());
                 newShop.setTelephone(request.getTelephone());
-                newShop.setUserId(request.getUserId());
-                shopDAO.save(newShop);
-
-                try {
-                    User user = userDAO.findById(request.getUserId()).get();
-                    List<SysRole> roles = new ArrayList<>();
-                    roles.add(sysRoleDAO.findByName("ROLE_USER"));
-                    roles.add(sysRoleDAO.findByName("ROLE_SELLER"));
-                    user.setRoles(roles);
-                    userDAO.save(user);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                newShop.setUser(request.getUser());
+                shopService.add(newShop);
+                return requestDAO.save(request);
             } else {
-                throw new Exception("店铺已存在");
+                throw new Exception("this person has a shop");
             }
-            return requestDAO.save(request);
         } else {
             if (id == null) {
                 throw new Exception("missing id");

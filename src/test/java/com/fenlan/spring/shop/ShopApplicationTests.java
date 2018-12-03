@@ -78,18 +78,18 @@ public class ShopApplicationTests {
         registerAdmin();
     }
 
-    @Test
-    public void addShop(){
-        Shop shop = new Shop();
-        shop.setEmail("1412328318@qq.com");
-        shop.setImage("a url");
-        shop.setName("hello shop");
-        shop.setInfo("a shop");
-        shop.setTelephone("18702953778");
-        long id = 1;
-        shop.setUserId(id);
-        shopService.saveShop(shop);
-    }
+//    @Test
+//    public void addShop(){
+//        Shop shop = new Shop();
+//        shop.setEmail("1412328318@qq.com");
+//        shop.setImage("a url");
+//        shop.setName("hello shop");
+//        shop.setInfo("a shop");
+//        shop.setTelephone("18702953778");
+//        long id = 1;
+//        shop.setUserId(id);
+//        shopService.saveShop(shop);
+//    }
 
     @Test
     public void updateShop(){

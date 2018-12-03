@@ -1,3 +1,5 @@
+package com.fenlan.spring.shop.service;
+
 /**
  * @author： fanzhonghao
  * @date: 18-12-1 19 26
@@ -5,17 +7,28 @@
  * @description:
  *   提供商店信息查看与修改功能
  */
-package com.fenlan.spring.shop.service;
-
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.User;
+import com.fenlan.spring.shop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.fenlan.spring.shop.DAO.ShopDAO;
+import com.fenlan.spring.shop.DAO.SysRoleDAO;
+import com.fenlan.spring.shop.DAO.UserDAO;
+import com.fenlan.spring.shop.bean.Shop;
+import com.fenlan.spring.shop.bean.SysRole;
+import com.fenlan.spring.shop.bean.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ShopService {
@@ -23,18 +36,14 @@ public class ShopService {
     ShopDAO shopDAO;
     @Autowired
     UserDAO userDAO;
+    @Autowired
+    SysRoleDAO sysRoleDAO;
     /**
      * 保存商店信息
      * @param shop
      */
     public void saveShop(Shop shop){
         shopDAO.save(shop);
-    }
-
-    public List<Shop> findAllShop() throws Exception{
-        List<Shop> shopList = shopDAO.findAll();
-        if (shopList == null) throw new Exception("null");
-        return shopList;
     }
 
     /**
@@ -52,10 +61,8 @@ public class ShopService {
      * @param id shop id
      * @return
      */
-    public Shop findByShopId(long id) throws Exception{
-        Shop shop = shopDAO.findById(id);
-        if (shop == null) throw new Exception("null");
-        return shop;
+    public Shop findByShopId(long id){
+        return shopDAO.findById(id);
     }
 
     /**
@@ -63,25 +70,71 @@ public class ShopService {
      * @param sellerName: seller name
      * @return shop
      */
-    public Shop findByOwnerName(String sellerName) throws Exception{
+    public Shop findByOwnerName(String sellerName){
+        if(sellerName == null){
+            return null;
+        }
         User user = userDAO.findByUsername(sellerName);
         if (user == null){
-            throw new Exception("null");
+            return null;
         }
-        Shop shop = shopDAO.findByUserId(user.getId());
-        if (shop == null) throw new Exception("null");
-        return shop;
+        return  shopDAO.findByUserId(user.getId());
     }
 
     /**
      * 由卖家名删除商店信息
      * @param sellerName
      */
-    public void deleteShopByOwnerName(String sellerName) throws Exception{
+    public void deleteShopByOwnerName(String sellerName) {
         User user = userDAO.findByUsername(sellerName);
-        if (user == null) throw new Exception("null");
+        if (user == null) return;
         Shop shop = shopDAO.findByUserId(user.getId());
         new ProductService().deleteProductWithShop(shop);
         shopDAO.delete(shop);
+    }
+
+    public Shop add(Shop shop) throws Exception {
+        if (null != shopDAO.findByName(shop.getName()))
+            throw new Exception("shop name is exist");
+        else {
+            try {
+                User user = shop.getUser();
+                List<SysRole> roles = new ArrayList<>();
+                roles.add(sysRoleDAO.findByName("ROLE_USER"));
+                roles.add(sysRoleDAO.findByName("ROLE_SELLER"));
+                user.setRoles(roles);
+                userDAO.save(user);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return shopDAO.save(shop);
+        }
+    }
+
+    // 需要改进筛选条件
+    public Long amount() {
+        return shopDAO.count();
+    }
+
+    public Shop findByName(String shopName) throws Exception {
+        Shop shop = shopDAO.findByName(shopName);
+        if (null == shop)
+            throw new Exception("don't have one shop named " + shopName);
+        else
+            return shop;
+    }
+
+    // 需要权衡异常处理
+    public Shop findByUserId(Long id) {
+        return shopDAO.findByUserId(id);
+    }
+
+    public List<Shop> list(int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Shop> list = shopDAO.findAll(pageable).getContent();
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return list;
     }
 }
