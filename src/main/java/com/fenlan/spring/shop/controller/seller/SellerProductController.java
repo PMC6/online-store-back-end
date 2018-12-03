@@ -20,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/seller")
-public class ProductController {
+public class SellerProductController {
     @Autowired
     private HttpServletRequest request;
     @Autowired
