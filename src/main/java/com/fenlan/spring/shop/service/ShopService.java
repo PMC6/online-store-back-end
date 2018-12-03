@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -55,6 +56,10 @@ public class ShopService {
             return shop;
     }
 
+    public Shop finById(Long id) {
+        return shopDAO.findById(id).get();
+    }
+
     // 需要权衡异常处理
     public Shop findByUserId(Long id) {
         return shopDAO.findByUserId(id);
@@ -67,5 +72,16 @@ public class ShopService {
             throw new Exception("no result or page param is bigger than normal");
         else
             return list;
+    }
+
+    public void delete(Long id) throws Exception {
+        try {
+            User seller = shopDAO.findById(id).get().getUser();
+            shopDAO.deleteById(id);
+            seller.setRoles(Arrays.asList(sysRoleDAO.findByName("ROLE_USER")));
+            userDAO.save(seller);
+        } catch (Exception e) {
+            throw new Exception("don't have this shop OR disconnect db");
+        }
     }
 }
