@@ -48,12 +48,13 @@ public class ShopService {
 
     /**
      * 更新商店信息
-     * @param originalShop 更改之前的商店信息
+     * @param originalShopId 更改之前的商店ID
      * @param targetShop 更改之后的商店信息
      */
-    public void update(Shop originalShop, Shop targetShop){
-        shopDAO.delete(originalShop);
+    public Shop update(long originalShopId, Shop targetShop){
+        shopDAO.deleteById(originalShopId);
         shopDAO.save(targetShop);
+        return shopDAO.findById((long) targetShop.getId());
     }
 
     /**
@@ -116,6 +117,12 @@ public class ShopService {
         return shopDAO.count();
     }
 
+    /**
+     * 由shopname查找shop信息
+     * @param shopName
+     * @return
+     * @throws Exception
+     */
     public Shop findByName(String shopName) throws Exception {
         Shop shop = shopDAO.findByName(shopName);
         if (null == shop)
@@ -136,5 +143,13 @@ public class ShopService {
             throw new Exception("no result or page param is bigger than normal");
         else
             return list;
+    }
+
+    /**
+     * 查找所有商店信息
+     * @return
+     */
+    public List<Shop> findAllShop(){
+        return shopDAO.findAll();
     }
 }

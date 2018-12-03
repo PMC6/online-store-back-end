@@ -52,6 +52,11 @@ public class ProductService {
         return productList;
     }
 
+    public Product findById(long id) throws Exception{
+        Product product = productDAO.findById(id);
+        if(product == null) throw new Exception("no this product");
+        return product;
+    }
     /**
      * update at 18.12.1 by fan
      * 由商店名查找商品
@@ -60,9 +65,9 @@ public class ProductService {
      */
     public List<Product> findByShopName(String shopName) throws Exception{
         Shop shop = shopDAO.findByName(shopName);
-        if (shop == null) throw new Exception("null");
+        if (shop == null) throw new Exception("not exist the shop");
         List<Product> productList = productDAO.findByShopId(shop.getId());
-        if (productList == null) throw new Exception("null");
+        if (productList == null) throw new Exception("not exist product");
         return productList;
     }
 
@@ -79,14 +84,40 @@ public class ProductService {
     }
 
     /**
+     * 由店铺id和商品名得到商品
+     * @param shopId
+     * @param productName
+     * @return
+     */
+    public Product findByShopIdAndProductName(long shopId, String productName){
+        Product product = productDAO.findByShopIdAndName(shopId, productName);
+        return product;
+    }
+
+    public List<Product> findByShopIdAndProductCategory(long shopId, String category) throws Exception{
+        Category category1 = categoryDAO.findByName(category);
+        if (category1 == null) throw new Exception("null");
+        long categoryId = category1.getId();
+        List<Product> productList = productDAO.findByShopIdAndCategoryId(shopId, categoryId);
+        if (productList == null) throw new Exception("null");
+        return productList;
+    }
+    /**
      * update at 18.12.1 by fan
      * 更新商品信息
-     * @param originalProduct
+     * @param originalProductId
      * @param targetProduct
      */
-    public void updateProduct(Product originalProduct, Product targetProduct){
-        productDAO.delete(originalProduct);
+    public Product updateProduct(long originalProductId, Product targetProduct){
+        productDAO.deleteById(originalProductId);
+        Product product = null;
         productDAO.save(targetProduct);
+        try {
+            product = findById(originalProductId);
+        } catch (Exception e) {
+
+        }
+        return product;
     }
 
     /**
@@ -102,6 +133,9 @@ public class ProductService {
         }
     }
 
+    public void deleteProductById(long id){
+        productDAO.deleteById(id);
+    }
     /**
      * update at 18.12.1 by fan
      * 删除每个商店的全部产品
