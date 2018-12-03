@@ -50,14 +50,19 @@ public class ProductController {
         }
     }
 
+    /**
+     * 由商品id得到商品具体信息
+     * @param productId
+     * @return
+     */
     @GetMapping("/productDetailedInfo")
-    public ResponseEntity<ResponseFormat> productDetailedInfo(@RequestParam("shopId") String shopName){
+    public ResponseEntity<ResponseFormat> productDetailedInfo(@RequestParam("productId") long productId){
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("find success")
                     .path(request.getServletPath())
-                    .data(productService.findByShopName(shopName))
+                    .data(productService.findById(productId))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -153,6 +158,12 @@ public class ProductController {
         }
     }
 
+    /**
+     * 由店铺id和商品名删除商品
+     * @param shopId
+     * @param productName
+     * @return
+     */
     @GetMapping("/search?{shopId}&{productName}")
     public ResponseEntity<ResponseFormat> findProductByName(@PathVariable long shopId,
                                                             @PathVariable String productName){
@@ -174,6 +185,12 @@ public class ProductController {
         }
     }
 
+    /**
+     * 由店铺id和商品类别得到商品列表
+     * @param shopId
+     * @param categoryName
+     * @return
+     */
     @GetMapping("/search?{shopId}&{categoryName}")
     public ResponseEntity<ResponseFormat> findProductByCategoryName(@PathVariable long shopId,
                                                                     @PathVariable String categoryName){
