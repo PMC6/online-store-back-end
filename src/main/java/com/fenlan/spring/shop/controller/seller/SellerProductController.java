@@ -174,18 +174,17 @@ public class SellerProductController {
 
     /**
      * 更新产品信息
-     * @param map
+     * @param updatedProduct
      * @return
      */
     @PutMapping("/product/update")
-    public ResponseEntity<ResponseFormat> updateProductInfo(@RequestBody Map<String, Object> map){
-        Product product = (Product) map.get("updatedProduct");
+    public ResponseEntity<ResponseFormat> updateProductInfo(@RequestBody Product updatedProduct){
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("update success")
                     .path(request.getServletPath())
-                    .data(productService.updateProduct(product))
+                    .data(productService.updateProduct(updatedProduct))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -224,18 +223,17 @@ public class SellerProductController {
 
     /**
      * 增加商品
-     * @param map
+     * @param newProduct
      * @return
      */
     @PutMapping("/addProduct")
-    public ResponseEntity<ResponseFormat> addProduct(@RequestBody Map<String, Object> map){
-        Product product =(Product) map.get("newProduct");
+    public ResponseEntity<ResponseFormat> addProduct(@RequestBody Product newProduct){
         try{
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("add success")
                     .path(request.getServletPath())
-                    .data(productService.add(product))
+                    .data(productService.add(newProduct))
                     .build(), HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())

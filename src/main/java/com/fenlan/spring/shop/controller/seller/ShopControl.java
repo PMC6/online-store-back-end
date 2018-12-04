@@ -60,18 +60,17 @@ public class ShopControl {
 
     /**
      * 更新商店信息
-     * @param map
+     * @param updatedShop
      * @return
      */
     @PutMapping("/updateShopInfo")
-    public ResponseEntity<ResponseFormat> updateShopInfo(@RequestBody Map<String, Object> map){
-        Shop shop = (Shop) map.get("targetShop");
+    public ResponseEntity<ResponseFormat> updateShopInfo(@RequestBody Shop updatedShop){
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
-                    .message("find success")
+                    .message("updated success")
                     .path(request.getServletPath())
-                    .data(shopService.update(shop))
+                    .data(shopService.update(updatedShop))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -104,15 +103,14 @@ public class ShopControl {
     }
 
     @PostMapping("/addShop")
-    public ResponseEntity<ResponseFormat> createShop(@RequestBody Map<String, Object> map){
-        Shop shop = (Shop) map.get("newShop");
+    public ResponseEntity<ResponseFormat> createShop(@RequestBody Shop newShop){
         try {
-            shopService.add(shop);
+            shopService.add(newShop);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("add success")
                     .path(request.getServletPath())
-                    .data(shop)
+                    .data(newShop)
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
