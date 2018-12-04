@@ -52,7 +52,7 @@ public class RequestService {
     public Request add(Request request) throws Exception {
         try {
             if (null == request.getName())
-                throw new Exception("missing 'shopName'");
+                throw new Exception("missing 'name'");
             else if (null != shopDAO.findByName(request.getName()))
                 throw new Exception("shop name is exist");
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -90,5 +90,13 @@ public class RequestService {
             }
         }
 
+    }
+
+    public void delete(Long id) throws Exception {
+        Request request = requestDAO.findById(id).get();
+        if (null != request)
+            requestDAO.deleteById(id);
+        else
+            throw new Exception("don't have this request");
     }
 }
