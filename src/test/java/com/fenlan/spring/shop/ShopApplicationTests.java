@@ -1,9 +1,11 @@
 package com.fenlan.spring.shop;
 
+import com.fenlan.spring.shop.DAO.CategoryDAO;
 import com.fenlan.spring.shop.DAO.RequestDAO;
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
+import com.fenlan.spring.shop.bean.Category;
 import com.fenlan.spring.shop.bean.Request;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.SysRole;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -33,6 +36,8 @@ public class ShopApplicationTests {
     RequestService requestService;
     @Autowired
     ShopService shopService;
+    @Autowired
+    CategoryDAO categoryDAO;
 
     @Test
     public void contextLoads() {
@@ -86,9 +91,23 @@ public class ShopApplicationTests {
     }
 
     @Test
+    public void addCategory() {
+        List<String> list = Arrays.asList("TV& Home Theater",
+                "Computers & Tablets", "Cell Phones", "Cameras & Camcorders",
+                "Audio", "Car Electronics & GPS", "Video, Games, Movies & Music",
+                "Health, Fitness & Sports", "Home & Office");
+        for (String item : list) {
+            Category category = new Category();
+            category.setName(item);
+            categoryDAO.save(category);
+        }
+    }
+
+    @Test
     public void init() {
         addRoles();
         registerAdmin();
+        addCategory();
     }
 
     @Test

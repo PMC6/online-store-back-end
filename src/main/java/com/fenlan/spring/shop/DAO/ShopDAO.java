@@ -9,6 +9,5 @@ public interface ShopDAO extends JpaRepository<Shop, Long> {
     /**
      * update at 18.12.1 by fan
      */
-    Shop findById(long id);
     Shop findByUserId(long id);
 }

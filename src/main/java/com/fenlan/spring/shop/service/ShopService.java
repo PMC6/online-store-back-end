@@ -7,14 +7,7 @@ package com.fenlan.spring.shop.service;
  * @description:
  *   提供商店信息查看与修改功能
  */
-import com.fenlan.spring.shop.DAO.ShopDAO;
-import com.fenlan.spring.shop.DAO.UserDAO;
-import com.fenlan.spring.shop.bean.Shop;
-import com.fenlan.spring.shop.bean.User;
 import com.fenlan.spring.shop.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
@@ -28,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -38,61 +32,6 @@ public class ShopService {
     UserDAO userDAO;
     @Autowired
     SysRoleDAO sysRoleDAO;
-    /**
-     * 保存商店信息
-     * @param shop
-     */
-    public void saveShop(Shop shop){
-        shopDAO.save(shop);
-    }
-
-    /**
-     * 更新商店信息
-     * @param originalShopId 更改之前的商店ID
-     * @param targetShop 更改之后的商店信息
-     */
-    public Shop update(long originalShopId, Shop targetShop){
-        shopDAO.deleteById(originalShopId);
-        shopDAO.save(targetShop);
-        return shopDAO.findById((long) targetShop.getId());
-    }
-
-    /**
-     * 由shop_id得到商店信息
-     * @param id shop id
-     * @return
-     */
-    public Shop findByShopId(long id){
-        return shopDAO.findById(id);
-    }
-
-    /**
-     * 由卖家名字得到其所有的商店的信息
-     * @param sellerName: seller name
-     * @return shop
-     */
-    public Shop findByOwnerName(String sellerName){
-        if(sellerName == null){
-            return null;
-        }
-        User user = userDAO.findByUsername(sellerName);
-        if (user == null){
-            return null;
-        }
-        return  shopDAO.findByUserId(user.getId());
-    }
-
-    /**
-     * 由卖家名删除商店信息
-     * @param sellerName
-     */
-    public void deleteShopByOwnerName(String sellerName) {
-        User user = userDAO.findByUsername(sellerName);
-        if (user == null) return;
-        Shop shop = shopDAO.findByUserId(user.getId());
-        new ProductService().deleteProductWithShop(shop);
-        shopDAO.delete(shop);
-    }
 
     public Shop add(Shop shop) throws Exception {
         if (null != shopDAO.findByName(shop.getName()))
@@ -131,6 +70,10 @@ public class ShopService {
             return shop;
     }
 
+    public Shop finById(Long id) {
+        return shopDAO.findById(id).get();
+    }
+
     // 需要权衡异常处理
     public Shop findByUserId(Long id) {
         return shopDAO.findByUserId(id);
@@ -145,11 +88,14 @@ public class ShopService {
             return list;
     }
 
-    /**
-     * 查找所有商店信息
-     * @return
-     */
-    public List<Shop> findAllShop(){
-        return shopDAO.findAll();
+    public void delete(Long id) throws Exception {
+        try {
+            User seller = shopDAO.findById(id).get().getUser();
+            shopDAO.deleteById(id);
+            seller.setRoles(Arrays.asList(sysRoleDAO.findByName("ROLE_USER")));
+            userDAO.save(seller);
+        } catch (Exception e) {
+            throw new Exception("don't have this shop OR disconnect db");
+        }
     }
 }

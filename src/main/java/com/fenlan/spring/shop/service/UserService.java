@@ -1,10 +1,15 @@
 package com.fenlan.spring.shop.service;
 
+import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
+import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.SysRole;
 import com.fenlan.spring.shop.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -19,6 +25,8 @@ public class UserService implements UserDetailsService {
     UserDAO userDAO;
     @Autowired
     SysRoleDAO sysRoleDAO;
+    @Autowired
+    ShopDAO shopDAO;
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
@@ -48,8 +56,21 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public List<User> list(int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registerTime"));
+        List<User> list = userDAO.findAll(pageable).getContent();
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return list;
+    }
+
     public User findByName(String username) {
         return userDAO.findByUsername(username);
+    }
+
+    public User findById(Long id) {
+        return userDAO.findById(id).get();
     }
 
     public User findByNameAndRole(String username, String role) throws Exception {
@@ -64,5 +85,15 @@ public class UserService implements UserDetailsService {
             return user;
         else
             throw new Exception(user.getUsername() + " " + "is not " + role.getName());
+    }
+
+    public void delete(Long id) {
+        User user = userDAO.findById(id).get();
+        if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER"))) {
+            Shop shop = shopDAO.findByUserId(user.getId());
+            shopDAO.deleteById(shop.getId());
+        }
+        user.setRoles(Arrays.asList(sysRoleDAO.findByName("ROLE_USER")));
+        userDAO.save(user);
     }
 }
