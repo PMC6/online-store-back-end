@@ -2,13 +2,16 @@ package com.fenlan.spring.shop;
 
 import com.fenlan.spring.shop.DAO.CategoryDAO;
 import com.fenlan.spring.shop.DAO.RequestDAO;
+import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.Category;
 import com.fenlan.spring.shop.bean.Request;
+import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.SysRole;
 import com.fenlan.spring.shop.bean.User;
 import com.fenlan.spring.shop.service.RequestService;
+import com.fenlan.spring.shop.service.ShopService;
 import com.fenlan.spring.shop.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +34,8 @@ public class ShopApplicationTests {
     RequestDAO requestDAO;
     @Autowired
     RequestService requestService;
+    @Autowired
+    ShopService shopService;
     @Autowired
     CategoryDAO categoryDAO;
 
@@ -59,6 +64,19 @@ public class ShopApplicationTests {
         }
     }
 
+    @Test
+    public void addUser(){
+        User user = new User();
+        SysRole role = sysRoleDAO.findByName("ROLE_USER");
+        System.out.println("at there --------------------------------------------------------------------------");
+        user.setUsername("fan");
+        user.setPassword("fan1996");
+        user.setRoles(Arrays.asList(role));
+        user.setAddress("xi dian");
+        user.setTelephone("187");
+        user.setEmail("1412328318@qq.com");
+        userDAO.save(user);
+    }
     @Test
     public void addRoles() {
         SysRole admin = new SysRole();
@@ -92,4 +110,47 @@ public class ShopApplicationTests {
         addCategory();
     }
 
+    @Test
+    public void addShop(){
+        Shop shop = new Shop();
+        shop.setEmail("1412328318@qq.com");
+        shop.setImage("a url");
+        shop.setName("hello shop");
+        shop.setInfo("a shop");
+        shop.setTelephone("18702953778");
+        long id = 1;
+        shop.setId(id);
+        shopService.saveShop(shop);
+    }
+
+
+//    @Test
+//    public void updateShop(){
+//        Shop shop = null;
+//        try {
+//            shop = shopService.findByShopId(1);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        Shop shop1 = null;
+//        try {
+//            shop1 = shopService.findByShopId(1);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        shop1.setTelephone("1234560");
+//        shopService.update(shop, shop1);
+//    }
+
+    @Test
+    public void findShop(){
+        try {
+            Shop shop = shopService.findByShopId(2);
+            System.out.println("shop name: -----------------------------------------  " + shop.getName());
+            shop = shopService.findByOwnerName("fan");
+            System.out.println("fan's shop name: ---------------------------------------  " + shop.getName());
+        }catch (Exception e){
+
+        }
+    }
 }

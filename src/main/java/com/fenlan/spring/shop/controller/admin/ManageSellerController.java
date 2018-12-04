@@ -54,7 +54,6 @@ public class ManageSellerController {
     public ResponseEntity<Object> searchBySellerame(@RequestParam("username") String sellerName) {
         try {
             User seller = userService.findByNameAndRole(sellerName, "ROLE_SELLER");
-            // Shop shop = shopService.findByUserId(seller.getId());
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("search success")
