@@ -27,18 +27,116 @@ public class SellerProductController {
     ProductService productService;
 
     /**
-     * 由店铺名得到该店铺的所有产品
+     * 由shopName得到商品信息
      * @param shopName
      * @return
      */
-    @GetMapping("/allProduct")
-    public ResponseEntity<ResponseFormat> allProduct(@RequestParam("shopName") String shopName){
+    @GetMapping("/allProductInfo")
+    public ResponseEntity<ResponseFormat> findProductsByShopName(@RequestParam("shopName") String shopName){
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("find success")
                     .path(request.getServletPath())
                     .data(productService.findByShopName(shopName))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("doesn't exist the shop or doesn't exist product")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 由shopId得到商品页，已由createtime排序
+     * @param shopId
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/partlyProduct")
+    public ResponseEntity<ResponseFormat> findProduct(@RequestParam("shopId") Long shopId,
+                                                      @RequestParam("page") int page,
+                                                      @RequestParam("size") int size){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("find success")
+                    .path(request.getServletPath())
+                    .data(productService.findByShopId(shopId, page, size))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error(null)
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 根据创建时间排序
+     * @param shopId
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/sortByCreateTime")
+    public ResponseEntity<ResponseFormat> findProductByCreateTime(@RequestParam("shopId") Long shopId,
+                                                      @RequestParam("page") int page,
+                                                      @RequestParam("size") int size){
+        return findProduct(shopId, page, size);
+    }
+
+    /**
+     * 根据创建时间排序
+     * @param shopId
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping("/sortByCreateTimeDec")
+    public ResponseEntity<ResponseFormat> findProductByCreateTimeDec(@RequestParam("shopId") Long shopId,
+                                                                     @RequestParam("page") int page,
+                                                                     @RequestParam("size") int size){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("find success")
+                    .path(request.getServletPath())
+                    .data(productService.findByShopIdDec(shopId, page, size))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error(e.getLocalizedMessage())
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 由店铺id和商品类别得到商品页
+     * @param shopId
+     * @param categoryName
+     * @return
+     */
+    @GetMapping("/search")
+    public ResponseEntity<ResponseFormat> findProductByCategoryName(@RequestParam("shopId") long shopId,
+                                                                    @RequestParam("category") String categoryName,
+                                                                    @RequestParam("page") int page,
+                                                                    @RequestParam("size") int size){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("find success")
+                    .path(request.getServletPath())
+                    .data(productService.findByShopIdAndCategory(shopId, categoryName, page, size))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -73,6 +171,7 @@ public class SellerProductController {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     /**
      * 更新产品信息
      * @param map
@@ -80,32 +179,22 @@ public class SellerProductController {
      */
     @PutMapping("/product/update")
     public ResponseEntity<ResponseFormat> updateProductInfo(@RequestBody Map<String, Object> map){
-//        Product product = new Product();
-//        product.setId((long) map.get("id"));
-//        product.setName((String) map.get("name"));
-//        product.setCategoryId((long) map.get("categoryId"));
-//        product.setImage((String) map.get("img"));
-//        product.setInfo((String) map.get("info"));
-//        product.setUserId((long) map.get("userId"));
-//        product.setPrice((double) map.get("price"));
-//        product.setNumber((int) map.get("number"));
-//        product.setShopId((long) map.get("shopId"));
-//        product.setHomePage((boolean) map.get("homePage"));
-//        product.setCreateTime((Date) map.get("createTime"));
-//        product.setUpdateTime((new Date().getTime()));
-//        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
-//                .error(null)
-//                .message("update success")
-//                .path(request.getServletPath())
-//                .data(productService.updateProduct(product.getId(),product))
-//                .build(), HttpStatus.OK);
         Product product = (Product) map.get("updatedProduct");
-        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
-                .error(null)
-                .message("update success")
-                .path(request.getServletPath())
-                .data(productService.updateProduct(product.getId(),product))
-                .build(), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("update success")
+                    .path(request.getServletPath())
+                    .data(productService.updateProduct(product))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error(null)
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -113,7 +202,7 @@ public class SellerProductController {
      * @param id
      * @return
      */
-    @PutMapping("/productInfo/delete")
+    @DeleteMapping("/productInfo/delete")
     public ResponseEntity<ResponseFormat> deleteProduct(@RequestParam("productId") long id){
         try {
             productService.deleteProductById(id);
@@ -149,59 +238,6 @@ public class SellerProductController {
                     .data(productService.add(product))
                     .build(), HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
-                    .error(null)
-                    .message(e.getLocalizedMessage())
-                    .path(request.getServletPath())
-                    .data(null)
-                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * 由店铺id和商品名删除商品
-     * @param shopId
-     * @param productName
-     * @return
-     */
-    @GetMapping("/search?{shopId}&{productName}")
-    public ResponseEntity<ResponseFormat> findProductByName(@PathVariable long shopId,
-                                                            @PathVariable String productName){
-
-        try {
-            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
-                    .error(null)
-                    .message("find success")
-                    .path(request.getServletPath())
-                    .data(productService.findByShopIdAndProductName(shopId,productName))
-                    .build(), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
-                    .error(null)
-                    .message(e.getLocalizedMessage())
-                    .path(request.getServletPath())
-                    .data(null)
-                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * 由店铺id和商品类别得到商品列表
-     * @param shopId
-     * @param categoryName
-     * @return
-     */
-    @GetMapping("/search?{shopId}&{categoryName}")
-    public ResponseEntity<ResponseFormat> findProductByCategoryName(@PathVariable long shopId,
-                                                                    @PathVariable String categoryName){
-        try {
-            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
-                    .error(null)
-                    .message("find success")
-                    .path(request.getServletPath())
-                    .data(productService.findByShopIdAndProductCategory(shopId, categoryName))
-                    .build(), HttpStatus.OK);
-        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .error(null)
                     .message(e.getLocalizedMessage())

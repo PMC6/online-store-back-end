@@ -1,6 +1,7 @@
 package com.fenlan.spring.shop.DAO;
 
 import com.fenlan.spring.shop.bean.Product;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,8 +13,11 @@ public interface ProductDAO extends JpaRepository<Product, Long> {
      * update by fan at 18.12.1
      */
     List<Product> findByShopId(long id);
+    List<Product> findByShopId(long id, Pageable pageable);
     List<Product> findByCategoryId(long id);
     void deleteAllByShopId(long id);
     Product findById(long id);
     List<Product> findByShopIdAndCategoryId(long shopId, long categoryId);
+    List<Product> findByShopIdAndCategoryId(Long shopId, Long categoryId, Pageable pageable);
+//    List<Product>
 }

@@ -7,9 +7,11 @@ import com.fenlan.spring.shop.bean.Category;
 import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.Shop;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Entity;
 import java.util.List;
 
 @Service
@@ -52,11 +54,51 @@ public class ProductService {
         return productList;
     }
 
+    /**
+     * 由shopId,category,page,size共同得到商品页
+     * @param shopId
+     * @param category
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<Product> findByShopIdAndCategory(Long shopId, String category, int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Product> list = productDAO.findByShopIdAndCategoryId(shopId,
+                categoryDAO.findByName(category).getId(), pageable);
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return list;
+    }
+
+    /**
+     * 由shopId,category,page,size共同得到商品页，时间逆序
+     * @param shopId
+     * @param category
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<Product> findByShopIdAndCategoryDES(Long shopId, String category, int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
+        List<Product> list = productDAO.findByShopIdAndCategoryId(shopId,
+                categoryDAO.findByName(category).getId(), pageable);
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return list;
+    }
+
+
     public Product findById(long id) throws Exception{
         Product product = productDAO.findById(id);
         if(product == null) throw new Exception("no this product");
         return product;
     }
+
     /**
      * update at 18.12.1 by fan
      * 由商店名查找商品
@@ -69,6 +111,40 @@ public class ProductService {
         List<Product> productList = productDAO.findByShopId(shop.getId());
         if (productList == null) throw new Exception("not exist product");
         return productList;
+    }
+
+    /**
+     * 由店铺id、页数和大小得到商品列表
+     * @param shopId
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<Product> findByShopId(Long shopId, int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Product> list = productDAO.findByShopId(shopId, pageable);
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return list;
+    }
+
+    /**
+     * 由店铺id、页数和大小得到商品列表，按时间逆序
+     * @param shopId
+     * @param page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public List<Product> findByShopIdDec(Long shopId, int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
+        List<Product> list = productDAO.findByShopId(shopId, pageable);
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return list;
     }
 
     /**
@@ -94,30 +170,18 @@ public class ProductService {
         return product;
     }
 
-    public List<Product> findByShopIdAndProductCategory(long shopId, String category) throws Exception{
-        Category category1 = categoryDAO.findByName(category);
-        if (category1 == null) throw new Exception("null");
-        long categoryId = category1.getId();
-        List<Product> productList = productDAO.findByShopIdAndCategoryId(shopId, categoryId);
-        if (productList == null) throw new Exception("null");
-        return productList;
-    }
     /**
      * update at 18.12.1 by fan
      * 更新商品信息
-     * @param originalProductId
      * @param targetProduct
      */
-    public Product updateProduct(long originalProductId, Product targetProduct){
-        productDAO.deleteById(originalProductId);
-        Product product = null;
-        productDAO.save(targetProduct);
+    public Product updateProduct(Product targetProduct) throws Exception{
         try {
-            product = findById(originalProductId);
-        } catch (Exception e) {
-
+            productDAO.save(targetProduct);
+        }catch (Exception e){
+            throw new Exception("can't update the product");
         }
-        return product;
+        return targetProduct;
     }
 
     /**
