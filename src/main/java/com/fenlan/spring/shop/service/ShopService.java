@@ -1,5 +1,13 @@
 package com.fenlan.spring.shop.service;
 
+/**
+ * @author： fanzhonghao
+ * @date: 18-12-1 19 26
+ * @version: 1.0
+ * @description:
+ *   提供商店信息查看与修改功能
+ */
+import com.fenlan.spring.shop.service.ProductService;
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
@@ -48,6 +56,12 @@ public class ShopService {
         return shopDAO.count();
     }
 
+    /**
+     * 由shopname查找shop信息
+     * @param shopName
+     * @return
+     * @throws Exception
+     */
     public Shop findByName(String shopName) throws Exception {
         Shop shop = shopDAO.findByName(shopName);
         if (null == shop)

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All shop info</title>
+</head>
+<body>
+<table>
+    <tr>
+        <td>
+            name: 
+        </td>
+        <td> 
+            Info: 
+        </td>
+    </tr>
+    
+    <!--/*@thymesVar id="shops" type="com.fenlan.spring.shop.bean.Shop"*/-->
+    <tr th:each="shop:${shops}">
+        <!--/*@thymesVar id="name" type="java.lang.String"*/-->
+        <td th:text="${shop.name}"></td>
+        <!--/*@thymesVar id="info" type="java.lang.String"*/-->
+        <td th:text="${shop.info}"></td>
+    </tr>
+</table>
+
+</body>
+</html>
