@@ -4,7 +4,8 @@ public enum Type {
     SELLER(0, "卖家"),
     SHOP(1, "店铺"),
     CUSTOMER(2, "买家"),
-    PRODUCT(3, "商品");
+    PRODUCT(3, "商品"),
+    ADMIN(4, "管理员");
 
     Type(int number, String description) {
         this.code = number;
@@ -28,6 +29,7 @@ public enum Type {
             case 1 : return SHOP;
             case 2 : return CUSTOMER;
             case 3 : return PRODUCT;
+            case 4 : return ADMIN;
             default : return null;
         }
     }
