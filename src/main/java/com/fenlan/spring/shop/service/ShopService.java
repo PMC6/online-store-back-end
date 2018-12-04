@@ -62,7 +62,7 @@ public class ShopService {
 
     // 需要权衡异常处理
     public Shop findByUserId(Long id) {
-        return shopDAO.findByUserId(id);
+        return shopDAO.findByUser(userDAO.findById(id).get());
     }
 
     public List<Shop> list(int page, int size) throws Exception {
@@ -78,7 +78,9 @@ public class ShopService {
         try {
             User seller = shopDAO.findById(id).get().getUser();
             shopDAO.deleteById(id);
-            seller.setRoles(Arrays.asList(sysRoleDAO.findByName("ROLE_USER")));
+            List<SysRole> list = new ArrayList<>();
+            list.add(sysRoleDAO.findByName("ROLE_USER"));
+            seller.setRoles(list);
             userDAO.save(seller);
         } catch (Exception e) {
             throw new Exception("don't have this shop OR disconnect db");
