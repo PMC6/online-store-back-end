@@ -51,9 +51,9 @@ public class RequestService {
 
     public Request add(Request request) throws Exception {
         try {
-            if (null == request.getShopName())
+            if (null == request.getName())
                 throw new Exception("missing 'shopName'");
-            else if (null != shopDAO.findByName(request.getShopName()))
+            else if (null != shopDAO.findByName(request.getName()))
                 throw new Exception("shop name is exist");
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             request.setStatus(RequestStatus.PROCESS);
@@ -71,7 +71,7 @@ public class RequestService {
             // 批准申请
             if (status == 1 && null == shopService.findByUserId(request.getUser().getId())) {
                 Shop newShop = new Shop();
-                newShop.setName(request.getShopName());
+                newShop.setName(request.getName());
                 newShop.setEmail(request.getEmail());
                 newShop.setImage(request.getImage());
                 newShop.setInfo(request.getInfo());

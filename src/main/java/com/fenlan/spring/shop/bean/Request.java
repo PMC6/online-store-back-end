@@ -9,7 +9,8 @@ public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String shopName;
+    @Column(name = "shopName")
+    private String name;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private User user;
     private RequestStatus status;
@@ -78,14 +79,6 @@ public class Request {
         this.updateTime = updateTime;
     }
 
-    public String getShopName() {
-        return shopName;
-    }
-
-    public void setShopName(String shopName) {
-        this.shopName = shopName;
-    }
-
     public RequestStatus getStatus() {
         return status;
     }
@@ -100,5 +93,13 @@ public class Request {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
