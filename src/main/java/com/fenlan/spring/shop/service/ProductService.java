@@ -50,8 +50,9 @@ public class ProductService {
         return product;
     }
 
-    public List<Product> findByName(String name) throws Exception {
-        List<Product> list = productDAO.findByName(name);
+    public List<Product> findByName(String name, Integer page, Integer size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Product> list = productDAO.findByName(pageable, name);
         if (list.size() == 0)
             throw new Exception("not found this product");
         return list;

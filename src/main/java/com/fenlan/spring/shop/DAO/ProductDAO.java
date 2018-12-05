@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ProductDAO extends JpaRepository<Product, Long> {
-    List<Product> findByName(String name);
+    List<Product> findByName(Pageable pageable, String name);
     Product findByNameAndShop(String name, Shop shop);
     List<Product> findAllByShopId(Pageable pageable, Long id);
 }
