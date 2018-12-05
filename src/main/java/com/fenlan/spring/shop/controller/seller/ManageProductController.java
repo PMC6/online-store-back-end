@@ -1,7 +1,9 @@
 package com.fenlan.spring.shop.controller.seller;
 
+import com.fenlan.spring.shop.bean.Category;
 import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.ResponseFormat;
+import com.fenlan.spring.shop.service.CategoryService;
 import com.fenlan.spring.shop.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,8 @@ public class ManageProductController {
     ProductService productService;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    CategoryService categoryService;
 
     @PostMapping("/product/add")
     public ResponseEntity<ResponseFormat> addProduct(@RequestBody Product param) {
@@ -79,6 +83,16 @@ public class ManageProductController {
         }
     }
 
+    @GetMapping("/product/amount")
+    public ResponseEntity<ResponseFormat> amount() {
+        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                .error(null)
+                .message("amount success")
+                .path(request.getServletPath())
+                .data(productService.amount())
+                .build(), HttpStatus.OK);
+    }
+
     @GetMapping("/product/list")
     public ResponseEntity<ResponseFormat> list(@RequestParam("page") Integer page,
                                                @RequestParam("size") Integer size) {
@@ -133,6 +147,26 @@ public class ManageProductController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .error("Search failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/product/category")
+    public ResponseEntity<ResponseFormat> getCategory() {
+        try {
+            List<Category> list = categoryService.list();
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get category success")
+                    .path(request.getServletPath())
+                    .data(list)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
                     .message(e.getLocalizedMessage())
                     .path(request.getServletPath())
                     .data(null)

@@ -98,11 +98,23 @@ public class ProductService {
         productDAO.deleteById(id);
     }
 
+    public long amount() {
+        return productDAO.count();
+    }
+
     public List<Product> list(Integer page, Integer size) throws Exception {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user = userDAO.findById(user.getId()).get();
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Product> list = productDAO.findAllByShopId(pageable, shopDAO.findByUser(user).getId());
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        return list;
+    }
+
+    public List<Product> listAll(Integer page, Integer size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Product> list = productDAO.findAll(pageable).getContent();
         if (list.size() == 0)
             throw new Exception("no result or page param is bigger than normal");
         return list;
