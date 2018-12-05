@@ -4,6 +4,7 @@ import com.fenlan.spring.shop.DAO.ProductDAO;
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.Product;
+import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -42,11 +43,28 @@ public class ProductService {
         }
     }
 
+    public Product findById(Long id) throws Exception {
+        Product product = productDAO.findById(id).get();
+        if (product == null)
+            throw new Exception("not found this product");
+        return product;
+    }
+
     public List<Product> findByName(String name) throws Exception {
         List<Product> list = productDAO.findByName(name);
         if (list.size() == 0)
-            throw new Exception("null");
+            throw new Exception("not found this product");
         return list;
+    }
+
+    public Product findByNamAndShop(String name) throws Exception {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user = userDAO.findById(user.getId()).get();
+        Shop shop = shopDAO.findByUser(user);
+        Product result = productDAO.findByNameAndShop(name, shop);
+        if (null == result)
+            throw new Exception("not found this product");
+        return result;
     }
 
     // 未异常处理
