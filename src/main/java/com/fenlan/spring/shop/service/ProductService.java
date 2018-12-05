@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -177,11 +178,21 @@ public class ProductService {
      */
     public Product updateProduct(Product targetProduct) throws Exception{
         try {
-            productDAO.save(targetProduct);
+//            productDAO.save(targetProduct);
+            Product product = productDAO.findById(targetProduct.getId()).get();
+            product.setName(targetProduct.getName());
+            product.setCategoryId(targetProduct.getCategoryId());
+            product.setImage(targetProduct.getImage());
+            product.setInfo(targetProduct.getInfo());
+            product.setPrice(targetProduct.getPrice());
+            product.setNumber(targetProduct.getNumber());
+            product.setHomePage(targetProduct.isHomePage());
+            product.setUpdateTime(new Date());
+            productDAO.save(product);
         }catch (Exception e){
             throw new Exception("can't update the product");
         }
-        return targetProduct;
+        return productDAO.findById(targetProduct.getId()).get();
     }
 
     /**

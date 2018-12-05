@@ -38,8 +38,8 @@ public class ShopControl {
      * @param ownerName
      * @return
      */
-    @GetMapping("/shopInfo")
-    public ResponseEntity<ResponseFormat> findShopByOwnerName(@RequestParam("ownerName") String ownerName){
+    @GetMapping("/shop/info")
+    public ResponseEntity<ResponseFormat> findShopByOwnerName(@RequestParam("userName") String ownerName){
 
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
@@ -63,7 +63,7 @@ public class ShopControl {
      * @param updatedShop
      * @return
      */
-    @PutMapping("/updateShopInfo")
+    @PutMapping("/shop/update")
     public ResponseEntity<ResponseFormat> updateShopInfo(@RequestBody Shop updatedShop){
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
@@ -82,7 +82,7 @@ public class ShopControl {
         }
     }
 
-    @DeleteMapping("/deleteShop")
+    @DeleteMapping("/shop/delete")
     public ResponseEntity<ResponseFormat> deleteShop(@RequestParam("shopId") Long shopId){
         try {
             shopService.delete(shopId);
@@ -102,7 +102,7 @@ public class ShopControl {
         }
     }
 
-    @PostMapping("/addShop")
+    @PostMapping("/shop/add")
     public ResponseEntity<ResponseFormat> createShop(@RequestBody Shop newShop){
         try {
             shopService.add(newShop);

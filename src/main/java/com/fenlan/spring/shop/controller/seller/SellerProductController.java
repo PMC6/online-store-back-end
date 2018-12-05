@@ -31,7 +31,7 @@ public class SellerProductController {
      * @param shopName
      * @return
      */
-    @GetMapping("/allProductInfo")
+    @GetMapping("/product/allInfo")
     public ResponseEntity<ResponseFormat> findProductsByShopName(@RequestParam("shopName") String shopName){
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
@@ -57,7 +57,7 @@ public class SellerProductController {
      * @param size
      * @return
      */
-    @GetMapping("/partlyProduct")
+    @GetMapping("/product/partly")
     public ResponseEntity<ResponseFormat> findProduct(@RequestParam("shopId") Long shopId,
                                                       @RequestParam("page") int page,
                                                       @RequestParam("size") int size){
@@ -85,7 +85,7 @@ public class SellerProductController {
      * @param size
      * @return
      */
-    @GetMapping("/sortByCreateTime")
+    @GetMapping("/product/sortByCreateTime")
     public ResponseEntity<ResponseFormat> findProductByCreateTime(@RequestParam("shopId") Long shopId,
                                                       @RequestParam("page") int page,
                                                       @RequestParam("size") int size){
@@ -99,7 +99,7 @@ public class SellerProductController {
      * @param size
      * @return
      */
-    @GetMapping("/sortByCreateTimeDec")
+    @GetMapping("/product/sortByCreateTimeDec")
     public ResponseEntity<ResponseFormat> findProductByCreateTimeDec(@RequestParam("shopId") Long shopId,
                                                                      @RequestParam("page") int page,
                                                                      @RequestParam("size") int size){
@@ -126,7 +126,7 @@ public class SellerProductController {
      * @param categoryName
      * @return
      */
-    @GetMapping("/search")
+    @GetMapping("/product/search")
     public ResponseEntity<ResponseFormat> findProductByCategoryName(@RequestParam("shopId") long shopId,
                                                                     @RequestParam("category") String categoryName,
                                                                     @RequestParam("page") int page,
@@ -153,7 +153,7 @@ public class SellerProductController {
      * @param productId
      * @return
      */
-    @GetMapping("/productDetailedInfo")
+    @GetMapping("/product/detailedInfo")
     public ResponseEntity<ResponseFormat> productDetailedInfo(@RequestParam("productId") long productId){
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
@@ -201,7 +201,7 @@ public class SellerProductController {
      * @param id
      * @return
      */
-    @DeleteMapping("/productInfo/delete")
+    @DeleteMapping("/product/delete")
     public ResponseEntity<ResponseFormat> deleteProduct(@RequestParam("productId") long id){
         try {
             productService.deleteProductById(id);
@@ -226,7 +226,7 @@ public class SellerProductController {
      * @param newProduct
      * @return
      */
-    @PutMapping("/addProduct")
+    @PutMapping("/product/add")
     public ResponseEntity<ResponseFormat> addProduct(@RequestBody Product newProduct){
         try{
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
