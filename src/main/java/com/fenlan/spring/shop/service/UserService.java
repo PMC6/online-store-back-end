@@ -100,7 +100,9 @@ public class UserService implements UserDetailsService {
             Shop shop = shopDAO.findByUser(user);
             shopDAO.deleteById(shop.getId());
         }
-        user.setRoles(Arrays.asList(sysRoleDAO.findByName("ROLE_USER")));
+        List<SysRole> list = new ArrayList<>();
+        list.add(sysRoleDAO.findByName("ROLE_USER"));
+        user.setRoles(list);
         userDAO.save(user);
     }
 }
