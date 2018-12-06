@@ -1,5 +1,10 @@
 package com.fenlan.spring.shop.controller.seller;
 
+import com.fenlan.spring.shop.DAO.ShopDAO;
+import com.fenlan.spring.shop.DAO.UserDAO;
+import com.fenlan.spring.shop.bean.Shop;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.fenlan.spring.shop.bean.Category;
 import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.ResponseFormat;
@@ -23,6 +28,10 @@ public class ManageProductController {
     private HttpServletRequest request;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    ShopDAO shopDAO;
+    @Autowired
+    UserDAO userDAO;
 
     @PostMapping("/product/add")
     public ResponseEntity<ResponseFormat> addProduct(@RequestBody Product param) {
@@ -161,6 +170,36 @@ public class ManageProductController {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("get category success")
+                    .path(request.getServletPath())
+                    .data(list)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 按照价格排序
+     * @return
+     */
+    @GetMapping("/product/sortByPrice")
+    public ResponseEntity<ResponseFormat> sortByTime(@RequestParam("page") int page,
+                                                     @RequestParam("size") int size,
+                                                     @RequestParam("positive") boolean positive){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        Shop shop = shopDAO.findByUser(userDAO.findByUsername(currentUserName));
+        try {
+            List<Product> list = productService.listByPrice(shop.getId(), page, size, positive);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get products success")
                     .path(request.getServletPath())
                     .data(list)
                     .build(), HttpStatus.OK);

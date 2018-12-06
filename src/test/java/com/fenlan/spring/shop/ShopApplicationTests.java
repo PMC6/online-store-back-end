@@ -91,6 +91,15 @@ public class ShopApplicationTests {
     }
 
     @Test
+    public void addTwoCategories(){
+        List<String> list = Arrays.asList("Clothes & Shoes", "Books");
+        for (String item : list) {
+            Category category = new Category();
+            category.setName(item);
+            categoryDAO.save(category);
+        }
+    }
+    @Test
     public void init() {
         addRoles();
         registerAdmin();

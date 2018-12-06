@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -48,6 +49,29 @@ public class ProductService {
         if (product == null)
             throw new Exception("not found this product");
         return product;
+    }
+
+    /**
+     * 按价格排序
+     * @param shopId
+     * @param page
+     * @param size
+     * @param positive 正序否
+     * @return
+     * @throws Exception
+     */
+    public List<Product> listByPrice(Long shopId, int page, int size, boolean positive) throws Exception {
+        Pageable pageable = null;
+        if (positive) {
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "price"));
+        }else {
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "price"));
+        }
+        List<Product> productList = productDAO.findAllByShopId(pageable, shopId);
+        if (productList.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return productList;
     }
 
     public List<Product> findByName(String name, Integer page, Integer size) throws Exception {
