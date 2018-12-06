@@ -1,14 +1,20 @@
 package com.fenlan.spring.shop.controller.seller;
 
+import com.fenlan.spring.shop.DAO.ShopDAO;
+import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.Category;
 import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.ResponseFormat;
+import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.service.CategoryService;
 import com.fenlan.spring.shop.service.ProductService;
 import com.fenlan.spring.shop.service.RequestService;
+import org.apache.catalina.security.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +30,10 @@ public class ManageProductController {
     private HttpServletRequest request;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    ShopDAO shopDAO;
+    @Autowired
+    UserDAO userDAO;
 
     @PostMapping("/product/add")
     public ResponseEntity<ResponseFormat> addProduct(@RequestBody Product param) {
@@ -182,10 +192,13 @@ public class ManageProductController {
     @GetMapping("/product/sortByPrice")
     public ResponseEntity<ResponseFormat> sortByTime(@RequestParam("page") int page,
                                                      @RequestParam("size") int size,
-                                                     @RequestParam("positive") boolean positive,
-                                                     @RequestParam("shopId") Long shopId){
+                                                     @RequestParam("positive") boolean positive){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        Shop shop = shopDAO.findByUser(userDAO.findByUsername(currentUserName));
         try {
-            List<Product> list = productService.listByPrice(shopId, page, size, positive);
+            List<Product> list = productService.listByPrice(shop.getId(), page, size, positive);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("get products success")
