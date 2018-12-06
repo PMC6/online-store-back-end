@@ -12,12 +12,13 @@ public class Product {
     private String name;
     @Column(columnDefinition="decimal(10,2) default '0.00'")
     private double price;
-    private Long categoryId;
+    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    private Category category;
     private String info;
-    private Long shopId;
+    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    private Shop shop;
     private String image;
     private int number;
-    private Long userId;
     private boolean homePage;
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createTime;
@@ -48,28 +49,12 @@ public class Product {
         this.price = price;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
-    }
-
     public String getInfo() {
         return info;
     }
 
     public void setInfo(String info) {
         this.info = info;
-    }
-
-    public Long getShopId() {
-        return shopId;
-    }
-
-    public void setShopId(Long shopId) {
-        this.shopId = shopId;
     }
 
     public String getImage() {
@@ -86,14 +71,6 @@ public class Product {
 
     public void setNumber(int number) {
         this.number = number;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public boolean isHomePage() {
@@ -118,5 +95,21 @@ public class Product {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Shop getShop() {
+        return shop;
+    }
+
+    public void setShop(Shop shop) {
+        this.shop = shop;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

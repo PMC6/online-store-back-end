@@ -7,7 +7,7 @@ package com.fenlan.spring.shop.service;
  * @description:
  *   提供商店信息查看与修改功能
  */
-import com.fenlan.spring.shop.DAO.ProductDAO;
+import com.fenlan.spring.shop.service.ProductService;
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -33,8 +32,6 @@ public class ShopService {
     UserDAO userDAO;
     @Autowired
     SysRoleDAO sysRoleDAO;
-    @Autowired
-    ProductDAO productDAO;
 
     public Shop add(Shop shop) throws Exception {
         if (null != shopDAO.findByName(shop.getName()))
@@ -79,22 +76,9 @@ public class ShopService {
 
     // 需要权衡异常处理
     public Shop findByUserId(Long id) {
-        return shopDAO.findByUserId(id);
+        return shopDAO.findByUser(userDAO.findById(id).get());
     }
 
-    public Shop findByOwnerName(String ownerName) throws Exception{
-        Shop shop = shopDAO.findByUserId(userDAO.findByUsername(ownerName).getId());
-        if (shop == null) throw new Exception("can't find the owner");
-        return shop;
-    }
-
-    /**
-     * 得到分页商铺信息
-     * @param page
-     * @param size
-     * @return
-     * @throws Exception
-     */
     public List<Shop> list(int page, int size) throws Exception {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Shop> list = shopDAO.findAll(pageable).getContent();
@@ -104,11 +88,6 @@ public class ShopService {
             return list;
     }
 
-    /**
-     * 删除店铺信息同时改变卖家状态,同时删除商店所有产品
-     * @param id
-     * @throws Exception
-     */
     public void delete(Long id) throws Exception {
         try {
             User seller = shopDAO.findById(id).get().getUser();
@@ -120,27 +99,5 @@ public class ShopService {
         } catch (Exception e) {
             throw new Exception("don't have this shop OR disconnect db");
         }
-    }
-
-    /**
-     * 更新shop数据
-     * @param shop
-     * @return
-     */
-    public Shop update(Shop shop) throws Exception{
-            try {
-                Shop shop1 = shopDAO.findById(shop.getId()).get();
-                shop1.setTelephone(shop.getTelephone());
-                shop1.setInfo(shop.getInfo());
-                shop1.setName(shop.getName());
-                shop1.setImage(shop.getImage());
-                shop1.setEmail(shop.getEmail());
-                shop1.setUpdateTime(new Date());
-                shop1.setUser(shop.getUser());
-                shopDAO.save(shop1);
-                return shop1;
-            }catch (Exception e){
-                throw new Exception("can't update the shop info");
-            }
     }
 }

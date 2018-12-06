@@ -5,6 +5,7 @@ import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.SysRole;
+import com.fenlan.spring.shop.bean.Type;
 import com.fenlan.spring.shop.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,9 +58,14 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    // shop 与 seller是一对一关系，因此直接查询shop 中的seller属性
+    // 并不建议这么查询，非常依赖shop 与seller的一对一关系
     public List<User> list(int page, int size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registerTime"));
-        List<User> list = userDAO.findAll(pageable).getContent();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Shop> shopList = shopDAO.findAll(pageable).getContent();
+        List<User> list = new ArrayList<>(size);
+        for (Shop shop : shopList)
+            list.add(shop.getUser());
         if (list.size() == 0)
             throw new Exception("no result or page param is bigger than normal");
         else
@@ -90,10 +97,12 @@ public class UserService implements UserDetailsService {
     public void delete(Long id) {
         User user = userDAO.findById(id).get();
         if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER"))) {
-            Shop shop = shopDAO.findByUserId(user.getId());
+            Shop shop = shopDAO.findByUser(user);
             shopDAO.deleteById(shop.getId());
         }
-        user.setRoles(Arrays.asList(sysRoleDAO.findByName("ROLE_USER")));
+        List<SysRole> list = new ArrayList<>();
+        list.add(sysRoleDAO.findByName("ROLE_USER"));
+        user.setRoles(list);
         userDAO.save(user);
     }
 }

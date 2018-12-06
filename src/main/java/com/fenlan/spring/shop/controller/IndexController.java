@@ -1,7 +1,11 @@
 package com.fenlan.spring.shop.controller;
 
+import com.fenlan.spring.shop.bean.Category;
+import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.ResponseFormat;
 import com.fenlan.spring.shop.bean.User;
+import com.fenlan.spring.shop.service.CategoryService;
+import com.fenlan.spring.shop.service.ProductService;
 import com.fenlan.spring.shop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/")
@@ -24,6 +29,10 @@ public class IndexController {
     private HttpServletRequest request;
     @Autowired
     AuthenticationManager manager;
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    ProductService productService;
 
     @GetMapping("")
     public ResponseEntity<ResponseFormat> index(Authentication auth) {
@@ -96,5 +105,46 @@ public class IndexController {
                 .path(request.getServletPath())
                 .data(user.getRoles())
                 .build(), HttpStatus.OK);
+    }
+
+    @GetMapping("category")
+    public ResponseEntity<ResponseFormat> getCategory() {
+        try {
+            List<Category> list = categoryService.list();
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get category success")
+                    .path(request.getServletPath())
+                    .data(list)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("list")
+    public ResponseEntity<ResponseFormat> list(@RequestParam("page") Integer page,
+                                               @RequestParam("size") Integer size) {
+        try {
+            List<Product> list = productService.list(page, size);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get product success")
+                    .path(request.getServletPath())
+                    .data(list)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
