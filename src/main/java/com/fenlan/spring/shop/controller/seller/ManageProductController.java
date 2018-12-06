@@ -2,19 +2,17 @@ package com.fenlan.spring.shop.controller.seller;
 
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
+import com.fenlan.spring.shop.bean.Shop;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.fenlan.spring.shop.bean.Category;
 import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.ResponseFormat;
-import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.service.CategoryService;
 import com.fenlan.spring.shop.service.ProductService;
-import com.fenlan.spring.shop.service.RequestService;
-import org.apache.catalina.security.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
