@@ -131,7 +131,7 @@ public class IndexController {
     public ResponseEntity<ResponseFormat> list(@RequestParam("page") Integer page,
                                                @RequestParam("size") Integer size) {
         try {
-            List<Product> list = productService.list(page, size);
+            List<Product> list = productService.listAll(page, size);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("get product success")
