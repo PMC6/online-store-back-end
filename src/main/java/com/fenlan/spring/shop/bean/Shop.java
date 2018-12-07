@@ -21,6 +21,8 @@ public class Shop {
     private Date createTime;
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updateTime;
+    @Column(unique = true)
+    private String alipay;
 
     public Long getId() {
         return id;
@@ -92,5 +94,13 @@ public class Shop {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getAlipay() {
+        return alipay;
+    }
+
+    public void setAlipay(String alipay) {
+        this.alipay = alipay;
     }
 }
