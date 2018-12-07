@@ -11,6 +11,7 @@ public class Advertisement {
     private Long id;
     private Long shopId;
     private Long productId;
+    @Column(columnDefinition = "TEXT")
     private String image;
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createTime;

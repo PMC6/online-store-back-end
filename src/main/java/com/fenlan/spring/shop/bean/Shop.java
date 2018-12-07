@@ -14,6 +14,7 @@ public class Shop {
     @OneToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private User user;
     private String info;
+    @Column(columnDefinition = "TEXT")
     private String image;
     private String email;
     private String telephone;

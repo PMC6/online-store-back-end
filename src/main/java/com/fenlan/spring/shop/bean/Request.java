@@ -14,6 +14,7 @@ public class Request {
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private User user;
     private RequestStatus status;
+    @Column(columnDefinition = "TEXT")
     private String image;
     private String info;
     private String email;
