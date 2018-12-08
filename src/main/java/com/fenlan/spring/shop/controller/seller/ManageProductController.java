@@ -3,6 +3,7 @@ package com.fenlan.spring.shop.controller.seller;
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.Shop;
+import com.fenlan.spring.shop.service.ShopService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import com.fenlan.spring.shop.bean.Category;
@@ -29,9 +30,7 @@ public class ManageProductController {
     @Autowired
     CategoryService categoryService;
     @Autowired
-    ShopDAO shopDAO;
-    @Autowired
-    UserDAO userDAO;
+    ShopService shopService;
 
     @PostMapping("/product/add")
     public ResponseEntity<ResponseFormat> addProduct(@RequestBody Product param) {
@@ -188,14 +187,14 @@ public class ManageProductController {
      * @return
      */
     @GetMapping("/product/sortByPrice")
-    public ResponseEntity<ResponseFormat> sortByTime(@RequestParam("page") int page,
+    public ResponseEntity<ResponseFormat> sortByPrice(@RequestParam("page") int page,
                                                      @RequestParam("size") int size,
                                                      @RequestParam("positive") boolean positive){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserName = authentication.getName();
-        Shop shop = shopDAO.findByUser(userDAO.findByUsername(currentUserName));
         try {
+            Shop shop = shopService.findByUserName(currentUserName);
             List<Product> list = productService.listByPrice(shop.getId(), page, size, positive);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
@@ -211,5 +210,38 @@ public class ManageProductController {
                     .data(null)
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * 按库存量排序
+     * @param page
+     * @param size
+     * @param positive
+     * @return
+     */
+    @GetMapping("/product/sortByStock")
+    public ResponseEntity<ResponseFormat> sortByStock(@RequestParam("page") int page,
+                                                      @RequestParam("size") int size,
+                                                      @RequestParam("positive") boolean positive){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        try {
+            Shop shop = shopService.findByUserName(currentUserName);
+            List<Product> list = productService.listByStock(shop.getId(), page, size, positive);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get products success")
+                    .path(request.getServletPath())
+                    .data(list)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

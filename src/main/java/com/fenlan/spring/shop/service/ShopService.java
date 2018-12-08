@@ -100,4 +100,16 @@ public class ShopService {
             throw new Exception("don't have this shop OR disconnect db");
         }
     }
+
+    /**
+     * 通过用户名查找店铺
+     * @param name
+     * @return
+     * @throws Exception
+     */
+    public Shop findByUserName(String name) throws Exception{
+        Shop shop = shopDAO.findByUser(userDAO.findByUsername(name));
+        if (shop == null) throw new Exception("can't find " + name + "'s shop");
+        return shop;
+    }
 }
