@@ -147,4 +147,25 @@ public class IndexController {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("product/search")
+    public ResponseEntity<Object> findByName(@RequestParam("name") String name,
+                                             @RequestParam("page") Integer page,
+                                             @RequestParam("size") Integer size) {
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("find product")
+                    .path(request.getServletPath())
+                    .data(productService.findByName(name, page, size))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query error")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
