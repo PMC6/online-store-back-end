@@ -42,7 +42,11 @@ public class UserService implements UserDetailsService {
     }
 
     public User register(String username, String password, String telephone, String email, String address) throws Exception {
-        if (null != userDAO.findByUsername(username))
+        if (null == username)
+            throw new Exception("username is required");
+        else if (null == password)
+            throw new Exception("password is required");
+        else if (null != userDAO.findByUsername(username))
             throw new Exception("username exist");
         else {
             User newUser = new User();
