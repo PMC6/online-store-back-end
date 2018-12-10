@@ -19,6 +19,7 @@ public class Request {
     private String info;
     private String email;
     private String telephone;
+    private String alipay;
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createTime;
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
@@ -102,5 +103,13 @@ public class Request {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAlipay() {
+        return alipay;
+    }
+
+    public void setAlipay(String alipay) {
+        this.alipay = alipay;
     }
 }
