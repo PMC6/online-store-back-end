@@ -151,6 +151,16 @@ public class IndexController {
         }
     }
 
+    @GetMapping("amount")
+    public ResponseEntity<ResponseFormat> amount() {
+        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                .error(null)
+                .message("get product success")
+                .path(request.getServletPath())
+                .data(productService.amount())
+                .build(), HttpStatus.OK);
+    }
+
     @GetMapping("product/search")
     public ResponseEntity<Object> findByName(@RequestParam("name") String name,
                                              @RequestParam("page") Integer page,
@@ -170,6 +180,16 @@ public class IndexController {
                     .data(null)
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("product/search/amount")
+    public ResponseEntity<ResponseFormat> amountByName(@RequestParam("name") String name) {
+        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                .error(null)
+                .message("get product success")
+                .path(request.getServletPath())
+                .data(productService.amountByName(name))
+                .build(), HttpStatus.OK);
     }
 
     @PostMapping("/change/password")

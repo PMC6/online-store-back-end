@@ -157,6 +157,10 @@ public class ProductService {
         return productDAO.count();
     }
 
+    public long amountByName(String name) {
+        return productDAO.countByNameContaining(name);
+    }
+
     public List<Product> list(Integer page, Integer size) throws Exception {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user = userDAO.findById(user.getId()).get();
