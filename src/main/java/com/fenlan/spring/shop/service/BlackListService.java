@@ -92,4 +92,12 @@ public class BlackListService {
         }
         return lists;
     }
+
+    public void delete(Long id) throws Exception {
+        BlackList one = blackListDAO.findById(id).get();
+        if (null == one)
+            throw new Exception("Not Fount this one in blackList");
+        else
+            blackListDAO.deleteById(id);
+    }
 }
