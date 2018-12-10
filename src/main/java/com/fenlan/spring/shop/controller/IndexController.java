@@ -157,7 +157,7 @@ public class IndexController {
                     .error(null)
                     .message("find product")
                     .path(request.getServletPath())
-                    .data(productService.findByName(name, page, size))
+                    .data(productService.findByNameContain(name, page, size))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
