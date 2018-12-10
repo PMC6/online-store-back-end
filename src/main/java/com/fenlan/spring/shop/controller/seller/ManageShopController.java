@@ -21,7 +21,7 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/seller")
-public class ManageShopInfo {
+public class ManageShopController {
     @Autowired
     ShopService shopService;
     @Autowired
