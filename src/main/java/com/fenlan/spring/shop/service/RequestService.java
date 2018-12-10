@@ -77,6 +77,7 @@ public class RequestService {
                 newShop.setInfo(request.getInfo());
                 newShop.setTelephone(request.getTelephone());
                 newShop.setUser(request.getUser());
+                newShop.setAlipay(request.getAlipay());
                 shopService.add(newShop);
                 return requestDAO.save(request);
             } else {
