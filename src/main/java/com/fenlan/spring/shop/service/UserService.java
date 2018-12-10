@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.InputMismatchException;
 import java.util.List;
 
 @Service
@@ -29,6 +34,8 @@ public class UserService implements UserDetailsService {
     SysRoleDAO sysRoleDAO;
     @Autowired
     ShopDAO shopDAO;
+    @Autowired
+    AuthenticationManager manager;
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
@@ -59,6 +66,25 @@ public class UserService implements UserDetailsService {
             newUser.setEmail(email);
             userDAO.save(newUser);
             return newUser;
+        }
+    }
+
+    public void changePasswd(String beforePasswd, String afterPasswd) throws Exception {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user = userDAO.findById(user.getId()).get();
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(), beforePasswd);
+        try {
+            manager.authenticate(token);
+            if (beforePasswd.equals(afterPasswd))
+                throw new InputMismatchException("beforePasswd is same as afterPasswd");
+            else {
+                user.setPassword(new BCryptPasswordEncoder().encode(afterPasswd));
+                userDAO.save(user);
+            }
+        } catch (InputMismatchException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Exception("before password is not correct");
         }
     }
 
