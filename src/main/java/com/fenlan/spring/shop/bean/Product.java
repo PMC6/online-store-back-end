@@ -2,6 +2,7 @@ package com.fenlan.spring.shop.bean;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -25,6 +26,9 @@ public class Product {
     private Date createTime;
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updateTime;
+
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.REMOVE})
+    private List<Cart> carts;
 
     public Long getId() {
         return id;
