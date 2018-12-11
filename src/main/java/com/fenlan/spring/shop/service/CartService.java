@@ -30,6 +30,7 @@ public class CartService {
             if (null != cart) {
                 cart.setNumber(cart.getNumber() + number);
             } else {
+                cart = new Cart();
                 cart.setUser(user);
                 cart.setNumber(number);
                 cart.setProduct(productDAO.getOne(productid));
