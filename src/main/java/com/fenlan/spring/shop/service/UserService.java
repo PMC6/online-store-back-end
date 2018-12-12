@@ -69,22 +69,22 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void changePasswd(String beforePasswd, String afterPasswd) throws Exception {
+    public void changePasswd(String exist, String newPasswd) throws Exception {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user = userDAO.findById(user.getId()).get();
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(), beforePasswd);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(user.getUsername(), exist);
         try {
             manager.authenticate(token);
-            if (beforePasswd.equals(afterPasswd))
-                throw new InputMismatchException("beforePasswd is same as afterPasswd");
+            if (exist.equals(newPasswd))
+                throw new InputMismatchException("existing password is same as new password");
             else {
-                user.setPassword(new BCryptPasswordEncoder().encode(afterPasswd));
+                user.setPassword(new BCryptPasswordEncoder().encode(newPasswd));
                 userDAO.save(user);
             }
         } catch (InputMismatchException e) {
             throw e;
         } catch (Exception e) {
-            throw new Exception("before password is not correct");
+            throw new Exception("existing password is not correct");
         }
     }
 
