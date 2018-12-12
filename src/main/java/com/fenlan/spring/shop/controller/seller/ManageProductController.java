@@ -1,7 +1,5 @@
 package com.fenlan.spring.shop.controller.seller;
 
-import com.fenlan.spring.shop.DAO.ShopDAO;
-import com.fenlan.spring.shop.DAO.UserDAO;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.service.ShopService;
 import org.springframework.security.core.Authentication;

@@ -80,9 +80,10 @@ public class RequestService {
                 newShop.setAlipay(request.getAlipay());
                 shopService.add(newShop);
                 return requestDAO.save(request);
-            } else {
+            } else if (null != shopService.findByUserId(request.getUser().getId())) {
                 throw new Exception("this person has a shop");
-            }
+            } else
+                return requestDAO.save(request);
         } else {
             if (id == null) {
                 throw new Exception("missing id");

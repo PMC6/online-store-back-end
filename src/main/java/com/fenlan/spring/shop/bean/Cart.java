@@ -9,8 +9,10 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;
-    private Long productId;
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private User user;
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private Product product;
     private int number;
     @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createTime;
@@ -23,14 +25,6 @@ public class Cart {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public int getNumber() {
@@ -57,11 +51,19 @@ public class Cart {
         this.updateTime = updateTime;
     }
 
-    public Long getProductId() {
-        return productId;
+    public User getUser() {
+        return user;
     }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }
