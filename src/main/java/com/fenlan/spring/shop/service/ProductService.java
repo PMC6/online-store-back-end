@@ -124,22 +124,37 @@ public class ProductService {
     }
 
     // 未异常处理
-    public Product update(Product product) throws Exception {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user = userDAO.findById(user.getId()).get();
-        try {
-            if (!product.getShop().getUser().equals(user))
-                throw new Exception("you don't have permission to operate");
-            if (null == product.getName())
-                throw new Exception("missing 'shopName'");
-            if (null == (Double)product.getPrice())
-                throw new Exception("missing 'price'");
-            if (null == (Integer)product.getNumber())
-                product.setNumber(0);
-            return productDAO.save(product);
-        } catch (Exception e) {
-            throw e;
+    public Product update(Product product, String userName) throws Exception {
+        User user = userDAO.findByUsername(userName);
+        Product product1 = productDAO.findById(product.getId()).get();
+        Shop userShop = shopDAO.findByUser(user);
+        if (! product1.getShop().getId().equals(userShop.getId())){
+            throw new Exception("You aren't allow to modify it");
+        }else {
+            product.setShop(userShop);
+            if (product.getName() == null){
+                throw new Exception("product's name is null");
+            }else {
+                try {
+                    if (product.getNumber() > 0){
+
+                    }
+                }catch (Exception e){
+                    product.setNumber(0);
+                }
+                try {
+                    if (product.getPrice() > 0){
+
+                    }
+                }catch (Exception e){
+                    throw new Exception("product's price is null");
+                }
+                if (product.getCategory() == null){
+                    throw new Exception("product's category is null");
+                }
+            }
         }
+        return productDAO.save(product);
     }
 
     public void delete(Long id) throws Exception {
