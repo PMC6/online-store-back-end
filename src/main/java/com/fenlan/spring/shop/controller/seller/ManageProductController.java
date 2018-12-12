@@ -52,12 +52,14 @@ public class ManageProductController {
 
     @PutMapping("/product/modify")
     public ResponseEntity<ResponseFormat> update(@RequestBody Product param) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String sellerName = authentication.getName();
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("update one product in your shop")
                     .path(request.getServletPath())
-                    .data(productService.update(param))
+                    .data(productService.update(param, sellerName))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
