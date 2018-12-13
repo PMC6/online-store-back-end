@@ -16,6 +16,7 @@ public class Request {
     private RequestStatus status;
     @Column(columnDefinition = "TEXT")
     private String image;
+    @Column(columnDefinition = "TEXT")
     private String info;
     private String email;
     private String telephone;

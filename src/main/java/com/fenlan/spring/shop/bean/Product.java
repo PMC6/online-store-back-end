@@ -15,6 +15,7 @@ public class Product {
     private double price;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private Category category;
+    @Column(columnDefinition = "TEXT")
     private String info;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private Shop shop;
