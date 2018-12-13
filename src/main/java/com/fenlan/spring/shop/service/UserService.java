@@ -91,7 +91,7 @@ public class UserService implements UserDetailsService {
     // shop 与 seller是一对一关系，因此直接查询shop 中的seller属性
     // 并不建议这么查询，非常依赖shop 与seller的一对一关系
     public List<User> list(int page, int size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         List<Shop> shopList = shopDAO.findAll(pageable).getContent();
         List<User> list = new ArrayList<>(size);
         for (Shop shop : shopList)

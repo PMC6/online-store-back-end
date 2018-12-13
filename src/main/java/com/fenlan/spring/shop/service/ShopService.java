@@ -80,7 +80,7 @@ public class ShopService {
     }
 
     public List<Shop> list(int page, int size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         List<Shop> list = shopDAO.findAll(pageable).getContent();
         if (list.size() == 0)
             throw new Exception("no result or page param is bigger than normal");
