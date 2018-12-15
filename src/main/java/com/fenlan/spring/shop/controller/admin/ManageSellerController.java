@@ -62,7 +62,7 @@ public class ManageSellerController {
     }
 
     @GetMapping("/search/sellername")
-    public ResponseEntity<ResponseFormat> searchBySellerame(@RequestParam("username") String sellerName) {
+    public ResponseEntity<ResponseFormat> searchBySellerName(@RequestParam("username") String sellerName) {
         try {
             User seller = userService.findByNameAndRole(sellerName, "ROLE_SELLER");
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
@@ -215,13 +215,22 @@ public class ManageSellerController {
 
     @DeleteMapping("/delete")
     public ResponseEntity<ResponseFormat> deleteSeller(@RequestParam("id") Long id) {
-        userService.delete(id);
-        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
-                .error(null)
-                .message("delete seller success")
-                .path(request.getServletPath())
-                .data(null)
-                .build(), HttpStatus.OK);
+        try {
+            userService.delete(id);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("delete seller success")
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Not found")
+                    .message("delete seller failed")
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
