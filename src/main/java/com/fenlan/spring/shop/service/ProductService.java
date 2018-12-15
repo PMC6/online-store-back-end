@@ -98,7 +98,7 @@ public class ProductService {
     }
 
     public List<Product> findByName(String name, Integer page, Integer size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Product> list = productDAO.findByName(pageable, name);
         if (list.size() == 0)
             throw new Exception("not found this product");
@@ -106,7 +106,7 @@ public class ProductService {
     }
 
     public List<Product> findByNameContain(String name, Integer page, Integer size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Product> list = productDAO.findAllByNameContaining(pageable, name);
         if (list.size() == 0)
             throw new Exception("not found this product");
@@ -178,7 +178,7 @@ public class ProductService {
     public List<Product> list(Integer page, Integer size) throws Exception {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user = userDAO.findById(user.getId()).get();
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Product> list = productDAO.findAllByShopId(pageable, shopDAO.findByUser(user).getId());
         if (list.size() == 0)
             throw new Exception("no result or page param is bigger than normal");
@@ -186,7 +186,7 @@ public class ProductService {
     }
 
     public List<Product> listAll(Integer page, Integer size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Product> list = productDAO.findAll(pageable).getContent();
         if (list.size() == 0)
             throw new Exception("no result or page param is bigger than normal");

@@ -87,7 +87,7 @@ public class BlackListService {
             Type listType = Type.getByCode(type);
             if (null == listType)
                 throw new Exception("type must in [0, 1, 2]");
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
             lists = blackListDAO.findAllByType(pageable, listType.getCode());
         }
         return lists;
