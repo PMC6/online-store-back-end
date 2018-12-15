@@ -1,19 +1,26 @@
 package com.fenlan.spring.shop.bean;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "advertisement")
+@EntityListeners(AuditingEntityListener.class)
 public class Advertisement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long shopId;
-    private Long productId;
+    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    private Shop shop;
+    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    private Product product;
+    private Double fee;
     @Column(columnDefinition = "TEXT")
     private String image;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreatedDate
     private Date createTime;
 
     public Long getId() {
@@ -40,19 +47,27 @@ public class Advertisement {
         this.createTime = createTime;
     }
 
-    public Long getShopId() {
-        return shopId;
+    public Double getFee() {
+        return fee;
     }
 
-    public void setShopId(Long shopId) {
-        this.shopId = shopId;
+    public void setFee(Double fee) {
+        this.fee = fee;
     }
 
-    public Long getProductId() {
-        return productId;
+    public Shop getShop() {
+        return shop;
     }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
+    public void setShop(Shop shop) {
+        this.shop = shop;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

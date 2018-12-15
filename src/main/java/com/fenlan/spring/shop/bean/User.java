@@ -1,5 +1,8 @@
 package com.fenlan.spring.shop.bean;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "user")
+@EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +26,9 @@ public class User implements UserDetails {
     private String telephone;
     private String email;
     private String address;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @LastModifiedDate
     private Date updateTime;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreatedDate
     private Date registerTime;
 
     @ManyToMany(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
