@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -60,14 +61,14 @@ public class AdService {
         return adRequestDAO.save(request);
     }
 
-    public Advertisement approval(Long id, Integer type) throws Exception {
+    public Advertisement process(Long id, Integer status) throws Exception {
         AdRequest request = adRequestDAO.findById(id).get();
         if (null == request)
             throw new Exception("not found this request");
         SysRole admin = sysRoleDAO.findByName("ROLE_ADMIN");
         if (!authUser().getRoles().contains(admin))
             throw new Exception("don't have permission");
-        switch (type) {
+        switch (status) {
             case 0: reject(request); return null;
             case 1: return approve(request);
             default: throw new Exception("invalid param 'type");
@@ -75,11 +76,25 @@ public class AdService {
 
     }
 
-    public List<Advertisement> listOneDay() {
-        Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String day = format.format(date).substring(0,10);
-        return advertisementDAO.findByCreateTimeContaining(day);
+    public List<AdRequest> listOneDayRequest(Integer status) throws Exception {
+        RequestStatus rs = RequestStatus.getByCode(status);
+        if (null == rs)
+            throw new Exception("param 'status' must be in [0, 1, 2]");
+        SysRole admin = sysRoleDAO.findByName("ROLE_ADMIN");
+        if (!authUser().getRoles().contains(admin))
+            throw new Exception("don't have permission");
+        return adRequestDAO
+                .findByCreateTimeGreaterThanEqualAndStatusOrderByFeeDesc(today(), rs);
+    }
+
+    public List<Advertisement> listProductTop() throws ParseException {
+        return advertisementDAO
+                .findByCreateTimeGreaterThanEqualAndProductNotNullOrderByFeeDesc(today());
+    }
+
+    public List<Advertisement> listShopTop() throws ParseException {
+        return advertisementDAO
+                .findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(today());
     }
 
     private Advertisement approve(AdRequest request) {
@@ -96,5 +111,13 @@ public class AdService {
     private void reject(AdRequest request) {
         request.setStatus(RequestStatus.REJECT);
         adRequestDAO.save(request);
+    }
+
+    private Date today() throws ParseException {
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String day = format.format(date).substring(0,10);
+        Date today = format.parse(day + " 00:00:00");
+        return today;
     }
 }
