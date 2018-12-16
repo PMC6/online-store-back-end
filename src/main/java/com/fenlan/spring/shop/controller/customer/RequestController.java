@@ -23,7 +23,7 @@ public class RequestController {
     private HttpServletRequest request;
 
     @PostMapping("")
-    public ResponseEntity<Object> add(@RequestBody Request request) {
+    public ResponseEntity<ResponseFormat> add(@RequestBody Request request) {
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
