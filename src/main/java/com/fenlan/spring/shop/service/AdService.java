@@ -28,7 +28,7 @@ public class AdService {
 
     private User authUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user = userDAO.findById(user.getId()).get();
+        return userDAO.findById(user.getId()).get();
     }
 
     public AdRequest addProductRequest(Long productId, Double fee, String image) throws Exception {
@@ -79,7 +79,10 @@ public class AdService {
     public List<AdRequest> listOneDayRequest(Integer status) throws Exception {
         RequestStatus rs = RequestStatus.getByCode(status);
         if (null == rs)
-            throw new Exception("param 'status' must be in [0, 1, 2]");
+            throw new Exception("param 'status' must be in ["
+                    + RequestStatus.PROCESS.getCode() + ", "
+                    + RequestStatus.APPROVE.getCode() + ", "
+                    + RequestStatus.REJECT.getCode() + "]");
         SysRole admin = sysRoleDAO.findByName("ROLE_ADMIN");
         if (!authUser().getRoles().contains(admin))
             throw new Exception("don't have permission");

@@ -25,10 +25,13 @@ public class ProductService {
     @Autowired
     UserDAO userDAO;
 
-    public Product add(Product newProduct) throws Exception {
+    private User authUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user = userDAO.findById(user.getId()).get();
-        newProduct.setShop(shopDAO.findByUser(user));
+        return userDAO.findById(user.getId()).get();
+    }
+
+    public Product add(Product newProduct) throws Exception {
+        newProduct.setShop(shopDAO.findByUser(authUser()));
         try {
             if (null == newProduct.getName())
                 throw new Exception("missing 'name' of product");
@@ -114,9 +117,7 @@ public class ProductService {
     }
 
     public Product findByNamAndShop(String name) throws Exception {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user = userDAO.findById(user.getId()).get();
-        Shop shop = shopDAO.findByUser(user);
+        Shop shop = shopDAO.findByUser(authUser());
         Product result = productDAO.findByNameAndShop(name, shop);
         if (null == result)
             throw new Exception("not found this product");
@@ -158,9 +159,7 @@ public class ProductService {
 
     public void delete(Long id) throws Exception {
         Product product = productDAO.findById(id).get();
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user = userDAO.findById(user.getId()).get();
-        if (!product.getShop().getUser().equals(user))
+        if (!product.getShop().getUser().equals(authUser()))
             throw new Exception("you don't have permission to operate");
         if (null == product)
             throw new Exception("this product is not in DB");
@@ -176,10 +175,8 @@ public class ProductService {
     }
 
     public List<Product> list(Integer page, Integer size) throws Exception {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user = userDAO.findById(user.getId()).get();
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-        List<Product> list = productDAO.findAllByShopId(pageable, shopDAO.findByUser(user).getId());
+        List<Product> list = productDAO.findAllByShopId(pageable, shopDAO.findByUser(authUser()).getId());
         if (list.size() == 0)
             throw new Exception("no result or page param is bigger than normal");
         return list;
