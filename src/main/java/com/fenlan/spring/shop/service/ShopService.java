@@ -7,7 +7,6 @@ package com.fenlan.spring.shop.service;
  * @description:
  *   提供商店信息查看与修改功能
  */
-import com.fenlan.spring.shop.service.ProductService;
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
@@ -18,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -32,6 +31,11 @@ public class ShopService {
     UserDAO userDAO;
     @Autowired
     SysRoleDAO sysRoleDAO;
+
+    private User authUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDAO.findById(user.getId()).get();
+    }
 
     public Shop add(Shop shop) throws Exception {
         if (null != shopDAO.findByName(shop.getName()))
@@ -111,5 +115,18 @@ public class ShopService {
         Shop shop = shopDAO.findByUser(userDAO.findByUsername(name));
         if (shop == null) throw new Exception("can't find " + name + "'s shop");
         return shop;
+    }
+
+    public Shop update(Shop shop) throws Exception {
+        SysRole admin = sysRoleDAO.findByName("ROLE_SELLER");
+        if (!authUser().getRoles().contains(admin))
+            throw new Exception("don't have permission");
+        Shop shop1 = shopDAO.findById(shop.getId()).get();
+        if (null == shop1)
+            throw new Exception("not found this shop");
+        if (null == shop.getName() || shop.getName().equals(""))
+            throw new Exception("must contain 'name' param");
+        shop.setUser(authUser());
+        return shopDAO.save(shop);
     }
 }
