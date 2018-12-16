@@ -7,21 +7,22 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "advertisement")
+@Table(name = "ad_request")
 @EntityListeners(AuditingEntityListener.class)
-public class Advertisement {
+public class AdRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
-    private Shop shop;
+    private Double fee;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private Product product;
-    private Double fee;
-    @Column(columnDefinition = "TEXT")
-    private String image;
+    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    private Shop shop;
     @CreatedDate
     private Date createTime;
+    @Column(columnDefinition = "TEXT")
+    private String image;
+    private RequestStatus status;
 
     public Long getId() {
         return id;
@@ -29,22 +30,6 @@ public class Advertisement {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
     }
 
     public Double getFee() {
@@ -55,6 +40,14 @@ public class Advertisement {
         this.fee = fee;
     }
 
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     public Shop getShop() {
         return shop;
     }
@@ -63,11 +56,27 @@ public class Advertisement {
         this.shop = shop;
     }
 
-    public Product getProduct() {
-        return product;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public RequestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RequestStatus status) {
+        this.status = status;
     }
 }

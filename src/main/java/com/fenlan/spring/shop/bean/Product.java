@@ -1,11 +1,16 @@
 package com.fenlan.spring.shop.bean;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "product")
+@EntityListeners(AuditingEntityListener.class)
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,6 +20,7 @@ public class Product {
     private double price;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private Category category;
+    @Column(columnDefinition = "TEXT")
     private String info;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private Shop shop;
@@ -22,9 +28,9 @@ public class Product {
     private String image;
     private int number;
     private boolean homePage;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreatedDate
     private Date createTime;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @LastModifiedDate
     private Date updateTime;
 
     @OneToMany(mappedBy = "product", cascade = {CascadeType.REMOVE})

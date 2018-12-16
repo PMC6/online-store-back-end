@@ -1,17 +1,21 @@
 package com.fenlan.spring.shop.bean;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "blacklist")
+@EntityListeners(AuditingEntityListener.class)
 public class BlackList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int type;
     private Long entityid;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreatedDate
     private Date createTime;
 
     public Long getId() {

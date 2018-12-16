@@ -1,10 +1,14 @@
 package com.fenlan.spring.shop.bean;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "favorite")
+@EntityListeners(AuditingEntityListener.class)
 public class Favorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,7 +16,7 @@ public class Favorite {
     private Long userId;
     private int type;
     private Long entityid;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreatedDate
     private Date createTime;
 
     public Long getId() {

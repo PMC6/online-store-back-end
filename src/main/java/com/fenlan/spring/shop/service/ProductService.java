@@ -123,7 +123,6 @@ public class ProductService {
         return result;
     }
 
-    // 未异常处理
     public Product update(Product product, String userName) throws Exception {
         User user = userDAO.findByUsername(userName);
         Product product1 = productDAO.findById(product.getId()).get();

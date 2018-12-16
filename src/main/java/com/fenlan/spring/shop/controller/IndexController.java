@@ -1,9 +1,7 @@
 package com.fenlan.spring.shop.controller;
 
-import com.fenlan.spring.shop.bean.Category;
-import com.fenlan.spring.shop.bean.Product;
-import com.fenlan.spring.shop.bean.ResponseFormat;
-import com.fenlan.spring.shop.bean.User;
+import com.fenlan.spring.shop.bean.*;
+import com.fenlan.spring.shop.service.AdService;
 import com.fenlan.spring.shop.service.CategoryService;
 import com.fenlan.spring.shop.service.ProductService;
 import com.fenlan.spring.shop.service.UserService;
@@ -36,6 +34,8 @@ public class IndexController {
     ProductService productService;
     @Autowired
     UserService userService;
+    @Autowired
+    AdService adService;
 
     @GetMapping("")
     public ResponseEntity<ResponseFormat> index(Authentication auth) {
@@ -207,6 +207,46 @@ public class IndexController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .error("Change failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/advertisement/product/list")
+    public ResponseEntity<ResponseFormat> listProductAd() {
+        try {
+            List<Advertisement> list = adService.listProductTop();
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get product advertisement list")
+                    .path(request.getServletPath())
+                    .data(list)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/advetisement/shop/list")
+    public ResponseEntity<ResponseFormat> listShopAd() {
+        try {
+            List<Advertisement> list = adService.listShopTop();
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get shop advertisement list")
+                    .path(request.getServletPath())
+                    .data(list)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
                     .message(e.getLocalizedMessage())
                     .path(request.getServletPath())
                     .data(null)

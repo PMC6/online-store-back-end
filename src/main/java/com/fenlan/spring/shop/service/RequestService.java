@@ -37,7 +37,7 @@ public class RequestService {
     }
 
     public List<Request> list(Integer status, int page, int size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updateTime"));
         List<Request> list;
         if (null == status)
             list = requestDAO.findAll(pageable).getContent();

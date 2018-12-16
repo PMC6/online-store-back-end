@@ -1,11 +1,16 @@
 package com.fenlan.spring.shop.bean;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "shop")
+@EntityListeners(AuditingEntityListener.class)
 public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,14 +19,15 @@ public class Shop {
     private String name;
     @OneToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private User user;
+    @Column(columnDefinition = "TEXT")
     private String info;
     @Column(columnDefinition = "TEXT")
     private String image;
     private String email;
     private String telephone;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreatedDate
     private Date createTime;
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @LastModifiedDate
     private Date updateTime;
     @Column(unique = true)
     private String alipay;

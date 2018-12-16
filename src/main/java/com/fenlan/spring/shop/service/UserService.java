@@ -91,7 +91,7 @@ public class UserService implements UserDetailsService {
     // shop 与 seller是一对一关系，因此直接查询shop 中的seller属性
     // 并不建议这么查询，非常依赖shop 与seller的一对一关系
     public List<User> list(int page, int size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         List<Shop> shopList = shopDAO.findAll(pageable).getContent();
         List<User> list = new ArrayList<>(size);
         for (Shop shop : shopList)
@@ -124,15 +124,19 @@ public class UserService implements UserDetailsService {
             throw new Exception(user.getUsername() + " " + "is not " + role.getName());
     }
 
-    public void delete(Long id) {
+    public void delete(Long id) throws Exception {
         User user = userDAO.findById(id).get();
-        if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER"))) {
+        if (null == user)
+            throw new Exception("not found this user");
+        else if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER"))) {
             Shop shop = shopDAO.findByUser(user);
             shopDAO.deleteById(shop.getId());
-        }
-        List<SysRole> list = new ArrayList<>();
-        list.add(sysRoleDAO.findByName("ROLE_USER"));
-        user.setRoles(list);
-        userDAO.save(user);
+            List<SysRole> list = new ArrayList<>();
+            list.add(sysRoleDAO.findByName("ROLE_USER"));
+            user.setRoles(list);
+            userDAO.save(user);
+        } else
+            userDAO.deleteById(id);
+
     }
 }
