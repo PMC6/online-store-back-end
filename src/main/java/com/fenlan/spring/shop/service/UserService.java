@@ -49,7 +49,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User register(String username, String password, String telephone, String email, String address) throws Exception {
-        if (null == username)
+        if (null == username || username.equals(""))
             throw new Exception("username is required");
         else if (null == password)
             throw new Exception("password is required");

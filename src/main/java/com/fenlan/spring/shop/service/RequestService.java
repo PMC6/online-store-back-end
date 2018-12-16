@@ -51,7 +51,7 @@ public class RequestService {
 
     public Request add(Request request) throws Exception {
         try {
-            if (null == request.getName())
+            if (null == request.getName() || request.getName().equals(""))
                 throw new Exception("missing 'name'");
             else if (null != shopDAO.findByName(request.getName()))
                 throw new Exception("shop name is exist");

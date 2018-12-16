@@ -33,7 +33,7 @@ public class ProductService {
     public Product add(Product newProduct) throws Exception {
         newProduct.setShop(shopDAO.findByUser(authUser()));
         try {
-            if (null == newProduct.getName())
+            if (null == newProduct.getName() || newProduct.getName().equals(""))
                 throw new Exception("missing 'name' of product");
             if (null == (Double)newProduct.getPrice())
                 throw new Exception("missing 'price'");
@@ -132,7 +132,7 @@ public class ProductService {
             throw new Exception("You aren't allow to modify it");
         }else {
             product.setShop(userShop);
-            if (product.getName() == null){
+            if (product.getName() == null || product.getName().equals("")){
                 throw new Exception("product's name is null");
             }else {
                 try {
