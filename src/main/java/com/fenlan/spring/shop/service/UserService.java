@@ -132,11 +132,11 @@ public class UserService implements UserDetailsService {
             throw new Exception(user.getUsername() + " " + "is not " + role.getName());
     }
 
-    public void delete(Long id) throws Exception {
+    public void deleteSeller(Long id) throws Exception {
         User user = userDAO.findById(id).get();
         if (null == user)
             throw new Exception("not found this user");
-        else if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER"))) {
+        if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER"))) {
             Shop shop = shopDAO.findByUser(user);
             shopDAO.deleteById(shop.getId());
             List<SysRole> list = new ArrayList<>();
@@ -144,8 +144,16 @@ public class UserService implements UserDetailsService {
             user.setRoles(list);
             userDAO.save(user);
         } else
-            userDAO.deleteById(id);
+            throw new Exception("this user is not seller");
+    }
 
+    public void deleteCustomer(Long id) throws Exception {
+        User user = userDAO.findById(id).get();
+        if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER")))
+            deleteSeller(id);
+        if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_ADMIN")))
+            throw new Exception("can't delete root");
+        userDAO.deleteById(id);
     }
 
     public Long amount() {

@@ -64,7 +64,7 @@ public class ManageCustomerController {
     @DeleteMapping("/delete")
     public ResponseEntity<ResponseFormat> deleteCustomer(@RequestParam("id") Long id) {
         try {
-            userService.delete(id);
+            userService.deleteCustomer(id);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("delete customer success")
