@@ -87,11 +87,10 @@ public class ManageShopController {
 
     @PostMapping("/shop/advertisement")
     public ResponseEntity<ResponseFormat> addShopAd(@RequestBody Map param) {
-        Long shopId = Long.parseLong(param.get("id").toString());
         Double fee = Double.parseDouble(param.get("fee").toString());
         String image = param.get("image").toString();
         try {
-            AdRequest adRequest = adService.addShopRequest(shopId, fee, image);
+            AdRequest adRequest = adService.addShopRequest(fee, image);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("add one shop advertisement request")
