@@ -29,6 +29,9 @@ public class ProductService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user = userDAO.findById(user.getId()).get();
         newProduct.setShop(shopDAO.findByUser(user));
+        String imgData = newProduct.getImage();
+        String imgUrl = new ImgService().storeImg(imgData);
+        newProduct.setImage(imgUrl);
         try {
             if (null == newProduct.getName())
                 throw new Exception("missing 'name' of product");
