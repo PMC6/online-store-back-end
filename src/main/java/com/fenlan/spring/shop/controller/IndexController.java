@@ -234,7 +234,7 @@ public class IndexController {
         }
     }
 
-    @GetMapping("/advetisement/shop/list")
+    @GetMapping("/advertisement/shop/list")
     public ResponseEntity<ResponseFormat> listShopAd() {
         try {
             List<Advertisement> list = adService.listShopTop();

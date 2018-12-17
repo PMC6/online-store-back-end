@@ -46,13 +46,10 @@ public class AdService {
         return adRequestDAO.save(request);
     }
 
-    public AdRequest addShopRequest(Long shopId, Double fee, String image) throws Exception {
-        Shop shop = shopDAO.findById(shopId).get();
+    public AdRequest addShopRequest(Double fee, String image) throws Exception {
+        Shop shop = shopDAO.findByUser(authUser());
         if (null == shop)
             throw new Exception("not found this shop");
-        boolean flag = shop.getUser().getId().equals(authUser().getId());
-        if (!flag)
-            throw new Exception("don't have permission");
         AdRequest request = new AdRequest();
         request.setShop(shop);
         request.setFee(fee);

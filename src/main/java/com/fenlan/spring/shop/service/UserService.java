@@ -91,7 +91,7 @@ public class UserService implements UserDetailsService {
     // shop 与 seller是一对一关系，因此直接查询shop 中的seller属性
     // 并不建议这么查询，非常依赖shop 与seller的一对一关系
     public List<User> list(int page, int size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registerTime"));
         List<Shop> shopList = shopDAO.findAll(pageable).getContent();
         List<User> list = new ArrayList<>(size);
         for (Shop shop : shopList)
@@ -100,6 +100,14 @@ public class UserService implements UserDetailsService {
             throw new Exception("no result or page param is bigger than normal");
         else
             return list;
+    }
+
+    public List<User> listCustomer(int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registerTime"));
+        List<User> list = userDAO.findAll(pageable).getContent();
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        return list;
     }
 
     public User findByName(String username) {
