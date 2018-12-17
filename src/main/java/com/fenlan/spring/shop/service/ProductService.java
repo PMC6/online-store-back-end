@@ -36,7 +36,7 @@ public class ProductService {
         String imgData = newProduct.getImage();
         String imgUrl = new ImgService().storeImg(imgData);
         newProduct.setImage(imgUrl);
-        
+
         try {
             if (null == newProduct.getName() || newProduct.getName().equals(""))
                 throw new Exception("missing 'name' of product");
