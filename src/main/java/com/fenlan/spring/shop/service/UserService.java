@@ -147,4 +147,8 @@ public class UserService implements UserDetailsService {
             userDAO.deleteById(id);
 
     }
+
+    public Long amount() {
+        return userDAO.count();
+    }
 }

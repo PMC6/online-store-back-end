@@ -80,4 +80,14 @@ public class ManageCustomerController {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/amount")
+    public ResponseEntity<ResponseFormat> amount() {
+        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                .error(null)
+                .message("query success")
+                .path(request.getServletPath())
+                .data(userService.amount())
+                .build(), HttpStatus.OK);
+    }
 }
