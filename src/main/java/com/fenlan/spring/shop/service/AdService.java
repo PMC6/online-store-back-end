@@ -65,11 +65,14 @@ public class AdService {
         SysRole admin = sysRoleDAO.findByName("ROLE_ADMIN");
         if (!authUser().getRoles().contains(admin))
             throw new Exception("don't have permission");
-        switch (status) {
-            case 0: reject(request); return null;
-            case 1: return approve(request);
-            default: throw new Exception("invalid param 'type");
-        }
+        if (request.getStatus().equals(RequestStatus.PROCESS)) {
+            switch (status) {
+                case 0: reject(request); return null;
+                case 1: return approve(request);
+                default: throw new Exception("invalid param 'type");
+            }
+        } else
+            throw new Exception("request is not in process");
 
     }
 

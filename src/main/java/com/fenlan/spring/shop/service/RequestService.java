@@ -65,7 +65,7 @@ public class RequestService {
     }
 
     public Request update(Long id, Integer status) throws Exception {
-        if (id != null && status != null) {
+        if (id != null && status != null && status.equals(0)) {
             Request request = requestDAO.getOne(id);
             request.setStatus(RequestStatus.values()[status]);
             // 批准申请
@@ -87,9 +87,10 @@ public class RequestService {
         } else {
             if (id == null) {
                 throw new Exception("missing id");
-            } else {
+            } else if (status == null){
                 throw new Exception("missing status");
-            }
+            } else
+                throw new Exception("request is not in process");
         }
 
     }
