@@ -1,5 +1,7 @@
 package com.fenlan.spring.shop.bean;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,6 +19,7 @@ public class Request {
     @Column(name = "shopName")
     private String name;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     private User user;
     private RequestStatus status;
     @Column(columnDefinition = "TEXT")
