@@ -261,6 +261,27 @@ public class IndexController {
         }
     }
 
+    @GetMapping("/user/auth")
+    public ResponseEntity<ResponseFormat> auth(Authentication auth, @RequestParam("username") String name) {
+        try {
+            if (null == auth || !auth.getName().equals(name))
+                throw new Exception("Login expired");
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("You are logged in to the system")
+                    .path(request.getServletPath())
+                    .data(auth)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Login expired")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // 暂定
     @PostMapping("/advertisement/upload")
     public ResponseEntity<ResponseFormat> uploads(@RequestParam("name") MultipartFile file) {
