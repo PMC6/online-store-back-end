@@ -66,10 +66,10 @@ public class AdService {
         if (!authUser().getRoles().contains(admin))
             throw new Exception("don't have permission");
         if (request.getStatus().equals(RequestStatus.PROCESS)) {
-            switch (status) {
-                case 0: reject(request); return null;
-                case 1: return approve(request);
-                default: throw new Exception("invalid param 'type");
+            switch (RequestStatus.getByCode(status)) {
+                case REJECT: reject(request); return null;
+                case APPROVE: return approve(request);
+                default: throw new Exception("invalid param 'status");
             }
         } else
             throw new Exception("request is not in process");
