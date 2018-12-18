@@ -92,15 +92,21 @@ public class AdService {
 
     public List<Advertisement> listProductTop() throws ParseException {
         return advertisementDAO
-                .findByCreateTimeGreaterThanEqualAndProductNotNullOrderByFeeDesc(today());
+                .findByCreateTimeGreaterThanEqualAndProductNotNullOrderByFeeDesc(yesterday());
     }
 
     public List<Advertisement> listShopTop() throws ParseException {
         return advertisementDAO
-                .findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(today());
+                .findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(yesterday());
     }
 
-    private Advertisement approve(AdRequest request) {
+    private Advertisement approve(AdRequest request) throws Exception {
+        Long amountOfProduct = advertisementDAO.countByCreateTimeGreaterThanEqualAndProductNotNull(today());
+        Long amountOfShop = advertisementDAO.countByCreateTimeGreaterThanEqualAndShopNotNull(today());
+        if (null != request.getProduct() && amountOfProduct > 10)
+            throw new Exception("product advertisement is filled");
+        if (null != request.getShop() && amountOfShop > 5)
+            throw new Exception("shop advertisement is filled");
         Advertisement ad = new Advertisement();
         ad.setProduct(request.getProduct());
         ad.setShop(request.getShop());
@@ -122,5 +128,13 @@ public class AdService {
         String day = format.format(date).substring(0,10);
         Date today = format.parse(day + " 00:00:00");
         return today;
+    }
+
+    private Date yesterday() throws ParseException {
+        Long timestamp = new Date().getTime() - 24*60*60*1000;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String yesterday = format.format(new Date(timestamp)).substring(0,10);
+        Date date = format.parse(yesterday);
+        return date;
     }
 }
