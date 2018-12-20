@@ -23,7 +23,7 @@ public class CartService {
     public Cart add(Long productId, Integer number) throws Exception {
         if (null == productId || null == number)
             throw new Exception("please set 'productid' or 'number' param");
-        Cart cart = cartDAO.findByUserIdAndProduct_Id(authUser().getId(), productId);
+        Cart cart = cartDAO.findByUserIdAndProductId(authUser().getId(), productId);
         try {
             if (null != cart) {
                 cart.setNumber(cart.getNumber() + number);

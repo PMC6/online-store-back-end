@@ -91,7 +91,7 @@ public class UserService implements UserDetailsService {
     // shop 与 seller是一对一关系，因此直接查询shop 中的seller属性
     // 并不建议这么查询，非常依赖shop 与seller的一对一关系
     public List<User> list(int page, int size) throws Exception {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Shop> shopList = shopDAO.findAll(pageable).getContent();
         List<User> list = new ArrayList<>(size);
         for (Shop shop : shopList)
@@ -100,6 +100,14 @@ public class UserService implements UserDetailsService {
             throw new Exception("no result or page param is bigger than normal");
         else
             return list;
+    }
+
+    public List<User> listCustomer(int page, int size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "registerTime"));
+        List<User> list = userDAO.findAll(pageable).getContent();
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        return list;
     }
 
     public User findByName(String username) {
@@ -124,11 +132,11 @@ public class UserService implements UserDetailsService {
             throw new Exception(user.getUsername() + " " + "is not " + role.getName());
     }
 
-    public void delete(Long id) throws Exception {
+    public void deleteSeller(Long id) throws Exception {
         User user = userDAO.findById(id).get();
         if (null == user)
             throw new Exception("not found this user");
-        else if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER"))) {
+        if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER"))) {
             Shop shop = shopDAO.findByUser(user);
             shopDAO.deleteById(shop.getId());
             List<SysRole> list = new ArrayList<>();
@@ -136,7 +144,19 @@ public class UserService implements UserDetailsService {
             user.setRoles(list);
             userDAO.save(user);
         } else
-            userDAO.deleteById(id);
+            throw new Exception("this user is not seller");
+    }
 
+    public void deleteCustomer(Long id) throws Exception {
+        User user = userDAO.findById(id).get();
+        if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_SELLER")))
+            deleteSeller(id);
+        if (user.getRoles().contains(sysRoleDAO.findByName("ROLE_ADMIN")))
+            throw new Exception("can't delete root");
+        userDAO.deleteById(id);
+    }
+
+    public Long amount() {
+        return userDAO.count();
     }
 }

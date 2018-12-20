@@ -32,11 +32,6 @@ public class ProductService {
 
     public Product add(Product newProduct) throws Exception {
         newProduct.setShop(shopDAO.findByUser(authUser()));
-
-        String imgData = newProduct.getImage();
-        String imgUrl = new ImgService().storeImg(imgData);
-        newProduct.setImage(imgUrl);
-
         try {
             if (null == newProduct.getName() || newProduct.getName().equals(""))
                 throw new Exception("missing 'name' of product");

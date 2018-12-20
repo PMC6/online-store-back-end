@@ -67,6 +67,8 @@ public class RequestService {
     public Request update(Long id, Integer status) throws Exception {
         if (id != null && status != null) {
             Request request = requestDAO.getOne(id);
+            if (!request.getStatus().equals(RequestStatus.PROCESS))
+                throw new Exception("request is not in process");
             request.setStatus(RequestStatus.values()[status]);
             // 批准申请
             if (status == 1 && null == shopService.findByUserId(request.getUser().getId())) {

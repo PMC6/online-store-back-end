@@ -46,13 +46,10 @@ public class AdService {
         return adRequestDAO.save(request);
     }
 
-    public AdRequest addShopRequest(Long shopId, Double fee, String image) throws Exception {
-        Shop shop = shopDAO.findById(shopId).get();
+    public AdRequest addShopRequest(Double fee, String image) throws Exception {
+        Shop shop = shopDAO.findByUser(authUser());
         if (null == shop)
             throw new Exception("not found this shop");
-        boolean flag = shop.getUser().getId().equals(authUser().getId());
-        if (!flag)
-            throw new Exception("don't have permission");
         AdRequest request = new AdRequest();
         request.setShop(shop);
         request.setFee(fee);
@@ -68,11 +65,14 @@ public class AdService {
         SysRole admin = sysRoleDAO.findByName("ROLE_ADMIN");
         if (!authUser().getRoles().contains(admin))
             throw new Exception("don't have permission");
-        switch (status) {
-            case 0: reject(request); return null;
-            case 1: return approve(request);
-            default: throw new Exception("invalid param 'type");
-        }
+        if (request.getStatus().equals(RequestStatus.PROCESS)) {
+            switch (RequestStatus.getByCode(status)) {
+                case REJECT: reject(request); return null;
+                case APPROVE: return approve(request);
+                default: throw new Exception("invalid param 'status");
+            }
+        } else
+            throw new Exception("request is not in process");
 
     }
 
@@ -92,15 +92,21 @@ public class AdService {
 
     public List<Advertisement> listProductTop() throws ParseException {
         return advertisementDAO
-                .findByCreateTimeGreaterThanEqualAndProductNotNullOrderByFeeDesc(today());
+                .findByCreateTimeGreaterThanEqualAndProductNotNullOrderByFeeDesc(yesterday());
     }
 
     public List<Advertisement> listShopTop() throws ParseException {
         return advertisementDAO
-                .findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(today());
+                .findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(yesterday());
     }
 
-    private Advertisement approve(AdRequest request) {
+    private Advertisement approve(AdRequest request) throws Exception {
+        Long amountOfProduct = advertisementDAO.countByCreateTimeGreaterThanEqualAndProductNotNull(today());
+        Long amountOfShop = advertisementDAO.countByCreateTimeGreaterThanEqualAndShopNotNull(today());
+        if (null != request.getProduct() && amountOfProduct > 10)
+            throw new Exception("product advertisement is filled");
+        if (null != request.getShop() && amountOfShop > 5)
+            throw new Exception("shop advertisement is filled");
         Advertisement ad = new Advertisement();
         ad.setProduct(request.getProduct());
         ad.setShop(request.getShop());
@@ -122,5 +128,13 @@ public class AdService {
         String day = format.format(date).substring(0,10);
         Date today = format.parse(day + " 00:00:00");
         return today;
+    }
+
+    private Date yesterday() throws ParseException {
+        Long timestamp = new Date().getTime() - 24*60*60*1000;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String yesterday = format.format(new Date(timestamp)).substring(0,10);
+        Date date = format.parse(yesterday);
+        return date;
     }
 }

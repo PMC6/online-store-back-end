@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface AdvertisementDAO extends JpaRepository<Advertisement, Long> {
-    List<Advertisement> findByCreateTimeGreaterThanEqualAndProductNotNullOrderByFeeDesc(Date today);
-    List<Advertisement> findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(Date today);
+    List<Advertisement> findByCreateTimeGreaterThanEqualAndProductNotNullOrderByFeeDesc(Date day);
+    List<Advertisement> findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(Date day);
+    Long countByCreateTimeGreaterThanEqualAndProductNotNull(Date day);
+    Long countByCreateTimeGreaterThanEqualAndShopNotNull(Date day);
 }

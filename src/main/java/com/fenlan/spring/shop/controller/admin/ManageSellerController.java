@@ -216,7 +216,7 @@ public class ManageSellerController {
     @DeleteMapping("/delete")
     public ResponseEntity<ResponseFormat> deleteSeller(@RequestParam("id") Long id) {
         try {
-            userService.delete(id);
+            userService.deleteSeller(id);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("delete seller success")

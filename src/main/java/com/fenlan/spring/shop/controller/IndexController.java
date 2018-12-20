@@ -13,8 +13,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -234,7 +241,7 @@ public class IndexController {
         }
     }
 
-    @GetMapping("/advetisement/shop/list")
+    @GetMapping("/advertisement/shop/list")
     public ResponseEntity<ResponseFormat> listShopAd() {
         try {
             List<Advertisement> list = adService.listShopTop();
@@ -252,5 +259,45 @@ public class IndexController {
                     .data(null)
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/user/auth")
+    public ResponseEntity<ResponseFormat> auth(Authentication auth, @RequestParam("username") String name) {
+        try {
+            if (null == auth || !auth.getName().equals(name))
+                throw new Exception("Login expired");
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("You are logged in to the system")
+                    .path(request.getServletPath())
+                    .data(auth)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Login expired")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // 暂定
+    @PostMapping("/advertisement/upload")
+    public ResponseEntity<ResponseFormat> uploads(@RequestParam("name") MultipartFile file) {
+        try {
+            String fileName = System.currentTimeMillis()+file.getOriginalFilename();
+            byte[] bytes = file.getBytes();
+            Path path = Paths.get("/home/fenlan/Pictures/"+fileName);
+            Files.write(path, bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                .error(null)
+                .message("get shop advertisement list")
+                .path(request.getServletPath())
+                .data(null)
+                .build(), HttpStatus.OK);
     }
 }

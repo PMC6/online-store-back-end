@@ -1,5 +1,7 @@
 package com.fenlan.spring.shop.bean;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -15,8 +17,10 @@ public class AdRequest {
     private Long id;
     private Double fee;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Product product;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Shop shop;
     @CreatedDate
     private Date createTime;

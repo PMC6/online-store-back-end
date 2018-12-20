@@ -5,6 +5,7 @@ import com.fenlan.spring.shop.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,13 +20,13 @@ public class CustomerController {
     private HttpServletRequest request;
 
     @GetMapping("/detail")
-    public ResponseEntity<ResponseFormat> getDetailByName(@RequestParam("name") String name) {
+    public ResponseEntity<ResponseFormat> getDetailByName(Authentication auth) {
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("query success")
                     .path(request.getServletPath())
-                    .data(userService.findByName(name))
+                    .data(userService.findByName(auth.getName()))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
