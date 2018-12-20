@@ -245,6 +245,39 @@ public class ManageProductController {
         }
 
     }
+  
+    /**
+     * 按是否应用于店铺主页排序，适用于manageProduct部分
+     * @param page
+     * @param size
+     * @param positive true表示已应用的在前
+     * @return
+     */
+    @GetMapping("/product/sortByAppliedToShop")
+    public ResponseEntity<ResponseFormat> sortByAppliedToShop(@RequestParam("page") int page,
+                                                      @RequestParam("size") int size,
+                                                      @RequestParam("positive") boolean positive){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        try {
+            Shop shop = shopService.findByUserName(currentUserName);
+            List<Product> list = productService.listByAppliedToShop(shop.getId(), page, size, positive);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get products success")
+                    .path(request.getServletPath())
+                    .data(list)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 
     @PostMapping("/product/advertisement")
     public ResponseEntity<ResponseFormat> addProductAd(@RequestBody Map param) {
