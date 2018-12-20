@@ -100,6 +100,29 @@ public class ProductService {
             return productList;
     }
 
+    /**
+     * 按是否应用于店铺主页排序
+     * @param shopId
+     * @param page
+     * @param size
+     * @param positive true表示在主页的在前
+     * @return
+     * @throws Exception
+     */
+    public List<Product> listByAppliedToShop(Long shopId, int page, int size, boolean positive) throws Exception{
+        Pageable pageable = null;
+        if (positive) {
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "homePage"));
+        }else {
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "homePage"));
+        }
+        List<Product> productList = productDAO.findAllByShopId(pageable, shopId);
+        if (productList.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return productList;
+    }
+
     public List<Product> findByName(String name, Integer page, Integer size) throws Exception {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Product> list = productDAO.findByName(pageable, name);
