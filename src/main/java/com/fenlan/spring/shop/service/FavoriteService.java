@@ -101,10 +101,10 @@ public class FavoriteService {
         favorite = new Favorite();
         favorite.setUserId(authUser().getId());
         favorite.setType(Type.PRODUCT.getCode());
-        Shop shop = shopDAO.findById(id).get();
-        if (null == shop)
+        Product product = productDAO.findById(id).get();
+        if (null == product)
             throw new Exception("Not Found this product");
-        favorite.setEntityid(shop.getId());
+        favorite.setEntityid(product.getId());
         return favoriteDAO.save(favorite);
     }
 }
