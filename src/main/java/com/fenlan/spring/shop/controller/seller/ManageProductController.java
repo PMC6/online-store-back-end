@@ -276,7 +276,37 @@ public class ManageProductController {
                     .data(null)
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
+    /**
+     * 将商店商品按照销量排序，为seller
+     * @param page
+     * @param size
+     * @param positive true表示销量大的在前
+     * @return
+     */
+    @GetMapping("/product/sortBySales")
+    public ResponseEntity<ResponseFormat> sortBySales(@RequestParam("page") int page,
+                                                      @RequestParam("size") int size,
+                                                      @RequestParam("positive") boolean positive){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        try {
+            Shop shop = shopService.findByUserName(currentUserName);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get products success")
+                    .path(request.getServletPath())
+                    .data(productService.listBySales(shop.getId(), page, size, positive))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/product/advertisement")
@@ -301,4 +331,5 @@ public class ManageProductController {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
