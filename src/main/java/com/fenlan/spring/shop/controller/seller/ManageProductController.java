@@ -279,7 +279,7 @@ public class ManageProductController {
     }
 
     /**
-     * 将商店商品按照销量排序，为seller
+     * 将商店商品按照销量排序
      * @param page
      * @param size
      * @param positive true表示销量大的在前
@@ -288,11 +288,10 @@ public class ManageProductController {
     @GetMapping("/product/sortBySales")
     public ResponseEntity<ResponseFormat> sortBySales(@RequestParam("page") int page,
                                                       @RequestParam("size") int size,
-                                                      @RequestParam("positive") boolean positive){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserName = authentication.getName();
+                                                      @RequestParam("positive") boolean positive,
+                                                      @RequestParam("shopName") String shopName){
         try {
-            Shop shop = shopService.findByUserName(currentUserName);
+            Shop shop = shopService.findByName(shopName);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("get products success")
