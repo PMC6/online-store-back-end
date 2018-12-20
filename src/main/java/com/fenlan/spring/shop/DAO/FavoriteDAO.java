@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface FavoriteDAO extends JpaRepository<Favorite, Long> {
-    List<Favorite> findByUserId(Long id);
+    List<Favorite> findByUserIdAndType(Long id, int type);
     Favorite findByUserIdAndTypeAndEntityid(Long userId, Integer type, Long entityId);
 }
