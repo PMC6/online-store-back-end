@@ -179,6 +179,15 @@ public class ProductService {
         return result;
     }
 
+    /**
+     * 得到应用于商店主页的所有广告商品
+     * @param shopId
+     * @return
+     */
+    public List<Product> findByAdvertisement(Long shopId){
+        return productDAO.findAllByShopIdAndHomePage(shopId, true);
+    }
+
     public Product update(Product product, String userName) throws Exception {
         User user = userDAO.findByUsername(userName);
         Product product1 = productDAO.findById(product.getId()).get();
