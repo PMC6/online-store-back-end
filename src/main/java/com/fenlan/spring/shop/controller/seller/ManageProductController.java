@@ -245,7 +245,7 @@ public class ManageProductController {
         }
 
     }
-
+  
     /**
      * 按是否应用于店铺主页排序，适用于manageProduct部分
      * @param page
