@@ -10,6 +10,7 @@ import com.fenlan.spring.shop.bean.AdRequest;
 import com.fenlan.spring.shop.bean.ResponseFormat;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.service.AdService;
+import com.fenlan.spring.shop.service.ProductService;
 import com.fenlan.spring.shop.service.ShopService;
 import com.fenlan.spring.shop.service.UserService;
 import org.springframework.security.core.Authentication;
@@ -34,6 +35,8 @@ public class ManageShopController {
     UserService userService;
     @Autowired
     AdService adService;
+    @Autowired
+    ProductService productService;
 
     /**
      * 由卖家名得到商店信息
@@ -119,6 +122,32 @@ public class ManageShopController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .error("Update failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 得到商店主页已应用的广告数量
+     * @return
+     */
+    @GetMapping("/shop/advertisement/num")
+    public ResponseEntity<ResponseFormat> getAdNum(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        try {
+            Shop shop = shopService.findByUserName(currentUserName);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("get products success")
+                    .path(request.getServletPath())
+                    .data(productService.amountByHomePageAndShopId(shop.getId(), true))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("Query failed")
                     .message(e.getLocalizedMessage())
                     .path(request.getServletPath())
                     .data(null)

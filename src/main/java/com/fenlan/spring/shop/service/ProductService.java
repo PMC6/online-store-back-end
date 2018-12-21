@@ -1,8 +1,10 @@
 package com.fenlan.spring.shop.service;
 
+import com.fenlan.spring.shop.DAO.OrderDAO;
 import com.fenlan.spring.shop.DAO.ProductDAO;
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
+import com.fenlan.spring.shop.bean.Order;
 import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.User;
@@ -14,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -24,6 +27,8 @@ public class ProductService {
     ShopDAO shopDAO;
     @Autowired
     UserDAO userDAO;
+    @Autowired
+    OrderDAO orderDAO;
 
     private User authUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -123,6 +128,33 @@ public class ProductService {
             return productList;
     }
 
+    /**
+     * 按销量为商品排序
+     * @param shopId
+     * @param page
+     * @param size
+     * @param positive true表示销量大的
+     * @return
+     * @throws Exception
+     */
+    public List<Product> listBySales(Long shopId, int page, int size, boolean positive) throws Exception{
+        Pageable pageable = null;
+        if (positive) {
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "homePage"));
+        }else {
+            pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "homePage"));
+        }
+        List<Order> orderList = orderDAO.findAllByShopIdAndStatus(pageable, shopId, "2");
+        List<Product> productList = new LinkedList<>();
+        for (Order order : orderList){
+            productList.add(productDAO.findById(order.getProductId()).get());
+        }
+        if (productList.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        else
+            return productList;
+    }
+
     public List<Product> findByName(String name, Integer page, Integer size) throws Exception {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Product> list = productDAO.findByName(pageable, name);
@@ -145,6 +177,15 @@ public class ProductService {
         if (null == result)
             throw new Exception("not found this product");
         return result;
+    }
+
+    /**
+     * 得到应用于商店主页的所有广告商品
+     * @param shopId
+     * @return
+     */
+    public List<Product> findByAdvertisement(Long shopId){
+        return productDAO.findAllByShopIdAndHomePage(shopId, true);
     }
 
     public Product update(Product product, String userName) throws Exception {
@@ -191,6 +232,16 @@ public class ProductService {
 
     public long amount() {
         return productDAO.count();
+    }
+
+    /**
+     * 根据shopId和homePage查找应用于商店主页的产品广告有多少
+     * @param shopId
+     * @param homePage
+     * @return
+     */
+    public long amountByHomePageAndShopId(Long shopId, boolean homePage){
+        return productDAO.countAllByShopIdAndHomePage(shopId, homePage);
     }
 
     public long amountByName(String name) {
