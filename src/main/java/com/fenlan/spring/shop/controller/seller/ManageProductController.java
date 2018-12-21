@@ -98,7 +98,7 @@ public class ManageProductController {
                 .error(null)
                 .message("amount success")
                 .path(request.getServletPath())
-                .data(productService.amount())
+                .data(productService.amount(null))
                 .build(), HttpStatus.OK);
     }
 
