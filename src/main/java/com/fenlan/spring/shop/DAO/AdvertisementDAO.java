@@ -1,8 +1,6 @@
 package com.fenlan.spring.shop.DAO;
 
 import com.fenlan.spring.shop.bean.Advertisement;
-import com.fenlan.spring.shop.bean.Product;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,5 +12,4 @@ public interface AdvertisementDAO extends JpaRepository<Advertisement, Long> {
     List<Advertisement> findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(Date day);
     Long countByCreateTimeGreaterThanEqualAndProductNotNull(Date day);
     Long countByCreateTimeGreaterThanEqualAndShopNotNull(Date day);
-    List<Advertisement> findAllByShopId(Pageable pageable, Long id);
 }

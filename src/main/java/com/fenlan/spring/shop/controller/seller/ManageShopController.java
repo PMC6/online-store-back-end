@@ -111,18 +111,13 @@ public class ManageShopController {
     }
 
     @PutMapping("/shop/update")
-    public ResponseEntity<ResponseFormat> update(@RequestBody Map map) {
+    public ResponseEntity<ResponseFormat> update(@RequestBody Shop shop) {
         try {
-            String image = map.get("image").toString();
-            String info = map.get("info").toString();
-            String email = map.get("email").toString();
-            String telephone = map.get("telephone").toString();
-            String alipay = map.get("alipay").toString();
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("update success")
                     .path(request.getServletPath())
-                    .data(shopService.update(image, info, email, telephone, alipay))
+                    .data(shopService.update(shop))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())

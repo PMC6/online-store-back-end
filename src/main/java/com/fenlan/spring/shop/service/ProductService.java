@@ -1,7 +1,13 @@
 package com.fenlan.spring.shop.service;
 
-import com.fenlan.spring.shop.DAO.*;
-import com.fenlan.spring.shop.bean.*;
+import com.fenlan.spring.shop.DAO.OrderDAO;
+import com.fenlan.spring.shop.DAO.ProductDAO;
+import com.fenlan.spring.shop.DAO.ShopDAO;
+import com.fenlan.spring.shop.DAO.UserDAO;
+import com.fenlan.spring.shop.bean.Order;
+import com.fenlan.spring.shop.bean.Product;
+import com.fenlan.spring.shop.bean.Shop;
+import com.fenlan.spring.shop.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +29,6 @@ public class ProductService {
     UserDAO userDAO;
     @Autowired
     OrderDAO orderDAO;
-    @Autowired
-    AdvertisementDAO advertisementDAO;
 
     private User authUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -278,21 +282,23 @@ public class ProductService {
         return list;
     }
 
-
-    /**
-     * 查看正在商城主页展示的商品
-     * @return
-     */
-    public List<Product> listByApplied(int page, int size, Long shopId) throws Exception{
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
-        List<Advertisement> list = advertisementDAO.findAllByShopId(pageable, shopId);
-        if (list == null) throw new Exception("no result or page param is bigger than normal");
-        List<Product> productList = new LinkedList<>();
-        for (int i = 0;i < list.size(); i++){
-            productList.add(list.get(i).getProduct());
-        }
-        if (productList.size() == 0) throw  new Exception("no result or page param is bigger than normal");
-        return productList;
+    // 草率了事，未做异常处理
+    public List<Product> listShopProduct(Long shopId, Integer page, Integer size, String name) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Product> list;
+        if (null == name || name.equals(""))
+            list = productDAO.findAllByShopId(pageable, shopId);
+        else
+            list = productDAO.findAllByShopIdAndNameContaining(pageable, shopId, name);
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        return list;
     }
 
+    public Long amountProductOfShop(Long shopId, String name) {
+        if (null == name || name.equals(""))
+            return productDAO.countByShopId(shopId);
+        else
+            return productDAO.countByShopIdAndNameContaining(shopId, name);
+    }
 }

@@ -142,7 +142,7 @@ public class AdService {
         Long timestamp = new Date().getTime() - 24*60*60*1000;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String yesterday = format.format(new Date(timestamp)).substring(0,10);
-        Date date = format.parse(yesterday);
+        Date date = format.parse(yesterday + " 00:00:00");
         return date;
     }
 }
