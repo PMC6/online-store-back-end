@@ -117,16 +117,18 @@ public class ShopService {
         return shop;
     }
 
-    public Shop update(Shop shop) throws Exception {
+    public Shop update(String image, String info, String email, String telephone, String alipay) throws Exception {
         SysRole admin = sysRoleDAO.findByName("ROLE_SELLER");
         if (!authUser().getRoles().contains(admin))
             throw new Exception("don't have permission");
-        Shop shop1 = shopDAO.findById(shop.getId()).get();
-        if (null == shop1)
+        Shop shop = shopDAO.findByUser(authUser());
+        if (null == shop)
             throw new Exception("not found this shop");
-        if (null == shop.getName() || shop.getName().equals(""))
-            throw new Exception("must contain 'name' param");
-        shop.setUser(authUser());
+        shop.setImage(image);
+        shop.setInfo(info);
+        shop.setEmail(email);
+        shop.setTelephone(telephone);
+        shop.setAlipay(alipay);
         return shopDAO.save(shop);
     }
 }
