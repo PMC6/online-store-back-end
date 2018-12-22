@@ -3,6 +3,9 @@ package com.fenlan.spring.shop.service;
 import com.fenlan.spring.shop.DAO.*;
 import com.fenlan.spring.shop.bean.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -76,7 +79,8 @@ public class AdService {
 
     }
 
-    public List<AdRequest> listOneDayRequest(Integer status) throws Exception {
+    public List<AdRequest> listOneDayRequest(Integer status, Integer page, Integer size) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         RequestStatus rs = RequestStatus.getByCode(status);
         if (null == rs)
             throw new Exception("param 'status' must be in ["
@@ -87,7 +91,11 @@ public class AdService {
         if (!authUser().getRoles().contains(admin))
             throw new Exception("don't have permission");
         return adRequestDAO
-                .findByCreateTimeGreaterThanEqualAndStatusOrderByFeeDesc(today(), rs);
+                .findByCreateTimeGreaterThanEqualAndStatusOrderByFeeDesc(pageable, today(), rs);
+    }
+
+    public Long amountOneDay() throws ParseException {
+        return adRequestDAO.countByCreateTimeGreaterThanEqual(today());
     }
 
     public List<Advertisement> listProductTop() throws ParseException {
