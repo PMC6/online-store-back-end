@@ -26,8 +26,13 @@ public class CartService {
         Cart cart = cartDAO.findByUserIdAndProductId(authUser().getId(), productId);
         try {
             if (null != cart) {
+                if (cart.getProduct().getNumber() < cart.getNumber()+number)
+                    throw new Exception("this product only "+cart.getProduct().getNumber()+" left in stock");
                 cart.setNumber(cart.getNumber() + number);
             } else {
+                int left = productDAO.getOne(productId).getNumber();
+                if (left < number)
+                    throw new Exception("this product only "+left+" left in stock");
                 cart = new Cart();
                 cart.setUser(authUser());
                 cart.setNumber(number);

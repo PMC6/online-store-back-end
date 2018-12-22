@@ -155,17 +155,25 @@ public class ProductService {
             return productList;
     }
 
-    public List<Product> findByName(String name, Integer page, Integer size) throws Exception {
+    public List<Product> findByName(String name, Integer page, Integer size, Long categoryId) throws Exception {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-        List<Product> list = productDAO.findByName(pageable, name);
+        List<Product> list;
+        if (null == categoryId)
+            list = productDAO.findByName(pageable, name);
+        else
+            list = productDAO.findByNameAndCategoryId(pageable, name, categoryId);
         if (list.size() == 0)
             throw new Exception("not found this product");
         return list;
     }
 
-    public List<Product> findByNameContain(String name, Integer page, Integer size) throws Exception {
+    public List<Product> findByNameContain(String name, Integer page, Integer size, Long categoryId) throws Exception {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-        List<Product> list = productDAO.findAllByNameContaining(pageable, name);
+        List<Product> list;
+        if (null == categoryId)
+            list = productDAO.findAllByNameContaining(pageable, name);
+        else
+            list = productDAO.findAllByNameContainingAndCategoryId(pageable, name, categoryId);
         if (list.size() == 0)
             throw new Exception("not found this product");
         return list;
@@ -230,8 +238,11 @@ public class ProductService {
         productDAO.deleteById(id);
     }
 
-    public long amount() {
-        return productDAO.count();
+    public long amount(Long categoryId) {
+        if (null == categoryId)
+            return productDAO.count();
+        else
+            return productDAO.countByCategoryId(categoryId);
     }
 
     /**
@@ -244,8 +255,11 @@ public class ProductService {
         return productDAO.countAllByShopIdAndHomePage(shopId, homePage);
     }
 
-    public long amountByName(String name) {
-        return productDAO.countByNameContaining(name);
+    public long amountByName(String name, Long categoryId) {
+        if (null == categoryId)
+            return productDAO.countByNameContaining(name);
+        else
+            return productDAO.countByNameContainingAndCategoryId(name, categoryId);
     }
 
     public List<Product> list(Integer page, Integer size) throws Exception {
@@ -256,9 +270,13 @@ public class ProductService {
         return list;
     }
 
-    public List<Product> listAll(Integer page, Integer size) throws Exception {
+    public List<Product> listAll(Integer page, Integer size, Long categoryId) throws Exception {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-        List<Product> list = productDAO.findAll(pageable).getContent();
+        List<Product> list;
+        if (null == categoryId)
+            list = productDAO.findAll(pageable).getContent();
+        else
+            list = productDAO.findAllByCategoryId(pageable, categoryId);
         if (list.size() == 0)
             throw new Exception("no result or page param is bigger than normal");
         return list;

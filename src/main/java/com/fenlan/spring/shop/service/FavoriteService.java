@@ -43,28 +43,38 @@ public class FavoriteService {
         }
     }
 
-    public List<Shop> listShop() {
-        List<Favorite> list = favoriteDAO.findByUserId(authUser().getId());
-        List<Shop> shopList = new ArrayList<>();
+    public List<FavoriteResponseFormat> listShop() {
+        List<Favorite> list = favoriteDAO.findByUserIdAndType(authUser().getId(), Type.SHOP.getCode());
+        List<FavoriteResponseFormat> shopList = new ArrayList<>();
         for (Favorite item : list) {
             Shop shop = shopDAO.findById(item.getEntityid()).get();
             if (null == shop)
                 favoriteDAO.deleteById(item.getId());
-            else
-                shopList.add(shop);
+            else {
+                FavoriteResponseFormat format = new FavoriteResponseFormat();
+                format.setId(item.getId());
+                format.setEntity(shop);
+                format.setCreateTime(item.getCreateTime());
+                shopList.add(format);
+            }
         }
         return shopList;
     }
 
-    public List<Product> listProduct() {
-        List<Favorite> list = favoriteDAO.findByUserId(authUser().getId());
-        List<Product> productList = new ArrayList<>();
+    public List<FavoriteResponseFormat> listProduct() {
+        List<Favorite> list = favoriteDAO.findByUserIdAndType(authUser().getId(), Type.PRODUCT.getCode());
+        List<FavoriteResponseFormat> productList = new ArrayList<>();
         for (Favorite item : list) {
             Product product = productDAO.findById(item.getEntityid()).get();
             if (null == product)
                 favoriteDAO.deleteById(item.getId());
-            else
-                productList.add(product);
+            else {
+                FavoriteResponseFormat format = new FavoriteResponseFormat();
+                format.setId(item.getId());
+                format.setEntity(product);
+                format.setCreateTime(item.getCreateTime());
+                productList.add(format);
+            }
         }
         return productList;
     }

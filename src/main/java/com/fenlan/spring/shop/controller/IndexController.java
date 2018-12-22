@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -139,9 +137,10 @@ public class IndexController {
 
     @GetMapping("list")
     public ResponseEntity<ResponseFormat> list(@RequestParam("page") Integer page,
-                                               @RequestParam("size") Integer size) {
+                                               @RequestParam("size") Integer size,
+                                               @RequestParam(value = "category", required = false) Long categoryId) {
         try {
-            List<Product> list = productService.listAll(page, size);
+            List<Product> list = productService.listAll(page, size, categoryId);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("get product success")
@@ -159,25 +158,26 @@ public class IndexController {
     }
 
     @GetMapping("amount")
-    public ResponseEntity<ResponseFormat> amount() {
+    public ResponseEntity<ResponseFormat> amount(@RequestParam(value = "category", required = false) Long categoryId) {
         return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                 .error(null)
                 .message("get product success")
                 .path(request.getServletPath())
-                .data(productService.amount())
+                .data(productService.amount(categoryId))
                 .build(), HttpStatus.OK);
     }
 
     @GetMapping("product/search")
     public ResponseEntity<Object> findByName(@RequestParam("name") String name,
                                              @RequestParam("page") Integer page,
-                                             @RequestParam("size") Integer size) {
+                                             @RequestParam("size") Integer size,
+                                             @RequestParam(value = "category", required = false) Long categoryId) {
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("find product")
                     .path(request.getServletPath())
-                    .data(productService.findByNameContain(name, page, size))
+                    .data(productService.findByNameContain(name, page, size, categoryId))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -190,12 +190,13 @@ public class IndexController {
     }
 
     @GetMapping("product/search/amount")
-    public ResponseEntity<ResponseFormat> amountByName(@RequestParam("name") String name) {
+    public ResponseEntity<ResponseFormat> amountByName(@RequestParam("name") String name,
+                                                       @RequestParam(value = "category", required = false) Long categoryId) {
         return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                 .error(null)
                 .message("get product success")
                 .path(request.getServletPath())
-                .data(productService.amountByName(name))
+                .data(productService.amountByName(name, categoryId))
                 .build(), HttpStatus.OK);
     }
 
