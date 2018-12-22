@@ -12,6 +12,7 @@ public interface ProductDAO extends JpaRepository<Product, Long> {
     List<Product> findByNameAndCategoryId(Pageable pageable, String name, Long id);
     Product findByNameAndShop(String name, Shop shop);
     List<Product> findAllByShopId(Pageable pageable, Long id);
+    List<Product> findAllByShopIdAndNameContaining(Pageable pageable, Long id, String name);
     List<Product> findAllByNameContaining(Pageable pageable, String name);
     List<Product> findAllByNameContainingAndCategoryId(Pageable pageable, String name, Long id);
     List<Product> findAllByCategoryId(Pageable pageable, Long id);
@@ -20,4 +21,6 @@ public interface ProductDAO extends JpaRepository<Product, Long> {
     Long countAllByShopIdAndHomePage(Long shopId, boolean homePage);
     List<Product> findAllByShopIdAndHomePage(Long shopId, boolean homePage);
     Long countByCategoryId(Long id);
+    Long countByShopId(Long id);
+    Long countByShopIdAndNameContaining(Long id, String name);
 }

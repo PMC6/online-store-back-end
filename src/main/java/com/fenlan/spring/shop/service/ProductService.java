@@ -281,4 +281,24 @@ public class ProductService {
             throw new Exception("no result or page param is bigger than normal");
         return list;
     }
+
+    // 草率了事，未做异常处理
+    public List<Product> listShopProduct(Long shopId, Integer page, Integer size, String name) throws Exception {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Product> list;
+        if (null == name || name.equals(""))
+            list = productDAO.findAllByShopId(pageable, shopId);
+        else
+            list = productDAO.findAllByShopIdAndNameContaining(pageable, shopId, name);
+        if (list.size() == 0)
+            throw new Exception("no result or page param is bigger than normal");
+        return list;
+    }
+
+    public Long amountProductOfShop(Long shopId, String name) {
+        if (null == name || name.equals(""))
+            return productDAO.countByShopId(shopId);
+        else
+            return productDAO.countByShopIdAndNameContaining(shopId, name);
+    }
 }
