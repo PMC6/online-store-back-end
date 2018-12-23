@@ -111,9 +111,9 @@ public class AdService {
     private Advertisement approve(AdRequest request) throws Exception {
         Long amountOfProduct = advertisementDAO.countByCreateTimeGreaterThanEqualAndProductNotNull(today());
         Long amountOfShop = advertisementDAO.countByCreateTimeGreaterThanEqualAndShopNotNull(today());
-        if (null != request.getProduct() && amountOfProduct > 10)
+        if (null != request.getProduct() && amountOfProduct >= 10)
             throw new Exception("product advertisement is filled");
-        if (null != request.getShop() && amountOfShop > 5)
+        if (null != request.getShop() && amountOfShop >= 5)
             throw new Exception("shop advertisement is filled");
         Advertisement ad = new Advertisement();
         ad.setProduct(request.getProduct());
