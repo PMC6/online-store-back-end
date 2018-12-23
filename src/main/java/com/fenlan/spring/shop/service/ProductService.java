@@ -299,18 +299,16 @@ public class ProductService {
     }
 
     /**
-     * 查看正在商城主页展示的商品
+     * 通过productId查看该商品是否应用于商城主页
+     * @param productId
      * @return
      */
-    public List<Product> listByApplied(int page, int size, Long shopId) throws Exception{
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
-        List<Advertisement> list = advertisementDAO.findAllByShopId(pageable, shopId);
-        if (list == null) throw new Exception("no result or page param is bigger than normal");
-        List<Product> productList = new LinkedList<>();
-        for (int i = 0;i < list.size(); i++){
-            productList.add(list.get(i).getProduct());
+    public boolean judgeWhereAppliedToMail(Long productId){
+        try {
+            List<Advertisement> list = advertisementDAO.findByProductId(productId);
+            return list.size() != 0;
+        }catch (Exception e){
+            return false;
         }
-        if (productList.size() == 0) throw  new Exception("no result or page param is bigger than normal");
-        return productList;
     }
 }

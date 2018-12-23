@@ -14,4 +14,6 @@ public interface AdvertisementDAO extends JpaRepository<Advertisement, Long> {
     Long countByCreateTimeGreaterThanEqualAndProductNotNull(Date day);
     Long countByCreateTimeGreaterThanEqualAndShopNotNull(Date day);
     List<Advertisement> findAllByShopId(Pageable pageable, Long id);
+    List<Advertisement> findByProductId(Long productId);
+    List<Advertisement> findByShopId(Long shopId);
 }
