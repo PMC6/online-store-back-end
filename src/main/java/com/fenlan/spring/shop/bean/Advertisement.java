@@ -18,7 +18,6 @@ public class Advertisement {
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private Product product;
     private Double fee;
-    @Column(columnDefinition = "TEXT")
     private String image;
     @CreatedDate
     private Date createTime;
