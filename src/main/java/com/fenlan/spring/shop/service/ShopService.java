@@ -7,9 +7,11 @@ package com.fenlan.spring.shop.service;
  * @description:
  *   提供商店信息查看与修改功能
  */
+import com.fenlan.spring.shop.DAO.AdvertisementDAO;
 import com.fenlan.spring.shop.DAO.ShopDAO;
 import com.fenlan.spring.shop.DAO.SysRoleDAO;
 import com.fenlan.spring.shop.DAO.UserDAO;
+import com.fenlan.spring.shop.bean.Advertisement;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.SysRole;
 import com.fenlan.spring.shop.bean.User;
@@ -31,6 +33,8 @@ public class ShopService {
     UserDAO userDAO;
     @Autowired
     SysRoleDAO sysRoleDAO;
+    @Autowired
+    AdvertisementDAO advertisementDAO;
 
     private User authUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -130,5 +134,19 @@ public class ShopService {
         shop.setTelephone(telephone);
         shop.setAlipay(alipay);
         return shopDAO.save(shop);
+    }
+
+    /**
+     * 通过shopId查看该店铺是否应用于商城主页
+     * @param shopId
+     * @return
+     */
+    public boolean judgeWhereAppliedToMail(Long shopId){
+        try {
+            List<Advertisement> list = advertisementDAO.findByShopId(shopId);
+            return list.size() != 0;
+        }catch (Exception e){
+            return false;
+        }
     }
 }
