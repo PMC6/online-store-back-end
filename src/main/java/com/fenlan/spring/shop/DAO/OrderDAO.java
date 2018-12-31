@@ -11,6 +11,7 @@ import java.util.List;
 public interface OrderDAO extends JpaRepository<Order, Long> {
     Order findByUserId(Long id);
     List<Order> findAllByShopIdAndStatus(Pageable pageable, Long shopId, String status);
+    List<Order> findAllByShopIdAndStatus(Long shopId, String status);
     List<Order> findAllByShopName(Pageable pageable, String shopName);
     List<Order> findAllByUserId(Pageable pageable, Long userId);
     int countAllByShopId(Long shopId);
@@ -19,5 +20,9 @@ public interface OrderDAO extends JpaRepository<Order, Long> {
     int countAllByUserIdAndStatus(Long userId, String status);
     List<Order> findAllByProductId(Pageable pageable, Long productId);
     int countAllByProductId(Long productId);
+    List<Order> findAllByCreateTimeBetween(Date before, Date after);
+    List<Order> findAllByCreateTimeBetweenAndShopId(Pageable pageable, Date before, Date after, Long shopId);
     List<Order> findAllByCreateTimeBetweenAndShopId(Date before, Date after, Long shopId);
+    List<Order> findAllByCreateTimeBetweenAndUserId(Pageable pageable, Date before, Date after, Long userID);
+    List<Order> findAllByUserIdAndStatus(Pageable pageable, Long userId, String status);
 }
