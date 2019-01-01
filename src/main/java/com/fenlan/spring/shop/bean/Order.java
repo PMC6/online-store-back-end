@@ -17,10 +17,12 @@ public class Order {
     private Date date;
     private Long productId;
     private String productName;
+    private String productImg;
     private String status;
     private Long shopId;
     private String shopName;
     private Long userId;
+    private String userName;
     private int number;
     @Column(columnDefinition="decimal(10,2) default '0.00'")
     private double price;
@@ -153,5 +155,21 @@ public class Order {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getProductImg() {
+        return productImg;
+    }
+
+    public void setProductImg(String productImg) {
+        this.productImg = productImg;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
