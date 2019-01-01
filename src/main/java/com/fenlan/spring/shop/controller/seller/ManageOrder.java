@@ -338,14 +338,15 @@ public class ManageOrder {
     private Date[] getYearTime(int yearNum){
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.YEAR, 0-yearNum);
+        cal.set(Calendar.MONTH, 1);
         cal.set(Calendar.DAY_OF_YEAR, 1);
+
         cal.add(Calendar.HOUR, -cal.getTime().getHours());
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
+        cal.add(Calendar.MINUTE, -cal.getTime().getMinutes());
+        cal.add(Calendar.SECOND, -cal.getTime().getSeconds());
         Date[] dates = new Date[2];
-        dates[0] = cal.getTime();//要的月份的第一天
-        cal.set(Calendar.DAY_OF_YEAR, Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR));
-        cal.set(Calendar.HOUR, 24);
+        dates[0] = cal.getTime();//第一天
+        cal.add(Calendar.DAY_OF_YEAR, Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR));
         dates[1] = cal.getTime();//最后一天
         return dates;
     }
@@ -380,7 +381,7 @@ public class ManageOrder {
         calendar.add(Calendar.MINUTE, -calendar.getTime().getMinutes());
         calendar.add(Calendar.SECOND, -calendar.getTime().getSeconds());
         dates[0] = calendar.getTime();
-        calendar.add(Calendar.DATE, 7-day+2);
+        calendar.add(Calendar.DATE, 7);
         dates[1] = calendar.getTime();
         return dates;
     }
