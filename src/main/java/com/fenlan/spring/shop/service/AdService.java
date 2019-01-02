@@ -108,6 +108,37 @@ public class AdService {
                 .findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(yesterday());
     }
 
+    /**
+     * 查看Mail一段时间内的广告收入
+     * @param before
+     * @param after
+     * @return
+     */
+    public double findSales(Date before, Date after){
+        List<Advertisement> list = null;
+        if (before != null && after != null) {
+            list = advertisementDAO.findAllByCreateTimeBetween(before, after);
+        }else list = advertisementDAO.findAll();
+        double sales = 0.0;
+        for (Advertisement advertisement : list){
+            sales += advertisement.getFee();
+        }
+        return sales;
+    }
+
+//    public double findSales(Date before, Date after, int page, int size) throws Exception{
+//        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+//        List<Advertisement> list = null;
+//        if (before != null && after != null) {
+//            list = advertisementDAO.findAllByCreateTimeBetween(pageable, before, after);
+//        }else throw new Exception("there need two date");
+//        double sales = 0.0;
+//        for (Advertisement advertisement : list){
+//            sales += advertisement.getFee();
+//        }
+//        return sales;
+//    }
+
     private Advertisement approve(AdRequest request) throws Exception {
         Long amountOfProduct = advertisementDAO.countByCreateTimeGreaterThanEqualAndProductNotNull(today());
         Long amountOfShop = advertisementDAO.countByCreateTimeGreaterThanEqualAndShopNotNull(today());
@@ -145,4 +176,5 @@ public class AdService {
         Date date = format.parse(yesterday + " 00:00:00");
         return date;
     }
+
 }

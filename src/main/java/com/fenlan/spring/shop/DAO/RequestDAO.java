@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface RequestDAO extends JpaRepository<Request, Long> {
     Request findByName(String name);
-    List<Request> findAllByStatus(RequestStatus status);
     List<Request> findAllByStatus(RequestStatus status, Pageable pageable);
     Long countByStatus(RequestStatus status);
 }

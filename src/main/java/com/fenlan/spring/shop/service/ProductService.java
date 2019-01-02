@@ -184,6 +184,22 @@ public class ProductService {
     }
 
     /**
+     * 模糊查找商品
+     * @param name
+     * @return
+     * @throws Exception
+     */
+    public List<Product> findByNameAndShop(String name, int page, int size) throws Exception {
+        Shop shop = shopDAO.findByUser(authUser());
+        if (shop == null) throw new Exception("you are not sellers");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+        List<Product> result = productDAO.findAllByNameLikeAndShop(pageable, "%"+name+"%", shop);
+        if (result.size() == 0)
+            throw new Exception("not found this product");
+        return result;
+    }
+
+    /**
      * 得到应用于商店主页的所有广告商品
      * @param shopId
      * @return

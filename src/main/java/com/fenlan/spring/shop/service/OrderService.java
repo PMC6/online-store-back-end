@@ -37,8 +37,13 @@ public class OrderService {
     UserDAO userDAO;
 
     //admin
-    public Order findById(Long orderId){
-        return orderDAO.findById(orderId).get();
+    public Order findById(Long orderId) throws Exception{
+        try {
+            Order order = orderDAO.findById(orderId).get();
+            return order;
+        }catch (Exception e){
+            throw new Exception("no this order");
+        }
     }
 
     /**
@@ -214,8 +219,12 @@ public class OrderService {
     public List<Order> findOrderBetweenTimes(Date before, Date after, int page, int size) throws Exception{
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         Shop shop = shopDAO.findByUser(authUser());
-        if (shop == null) throw new Exception("you are not sellers");
-        List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndShopId(pageable, before, after, shop.getId());
+        List<Order> orderList = null;
+        if (shop == null) {
+            orderList = orderDAO.findAllByCreateTimeBetween(pageable, before, after);
+        }else {
+            orderList = orderDAO.findAllByCreateTimeBetweenAndShopId(pageable, before, after, shop.getId());
+        }
         if (orderList.size() == 0) throw new Exception("no order at this time");
         return orderList;
     }

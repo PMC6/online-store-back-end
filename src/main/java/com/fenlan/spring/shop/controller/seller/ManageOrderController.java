@@ -10,10 +10,7 @@ import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.ResponseFormat;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.User;
-import com.fenlan.spring.shop.service.OrderService;
-import com.fenlan.spring.shop.service.ProductService;
-import com.fenlan.spring.shop.service.ShopService;
-import com.fenlan.spring.shop.service.UserService;
+import com.fenlan.spring.shop.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +26,7 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/seller")
-public class ManageOrder {
+public class ManageOrderController {
     @Autowired
     OrderService orderService;
     @Autowired
@@ -40,6 +37,8 @@ public class ManageOrder {
     ProductService productService;
     @Autowired
     ShopService shopService;
+    @Autowired
+    TimeService timeService;
 
     /**
      * 商家更新订单状态
@@ -202,7 +201,7 @@ public class ManageOrder {
                                                      @RequestParam("page") int page,
                                                      @RequestParam("size") int size){
         Date[] dates = null;
-        dates = timeSelector(beforeNum, type);
+        dates = timeService.timeSelector(beforeNum, type);
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
@@ -229,7 +228,7 @@ public class ManageOrder {
     @GetMapping("/order/findSale")
     public ResponseEntity<ResponseFormat> findSale(@RequestParam("beforeNum") int beforeNum,
                                                            @RequestParam("type") String type){
-        Date[] dates = timeSelector(beforeNum, type);
+        Date[] dates = timeService.timeSelector(beforeNum, type);
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
@@ -298,93 +297,5 @@ public class ManageOrder {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    public Date[] timeSelector(int beforeNum, String type){
-        Date[] dates = null;
-        if (type.equals("monthly"))
-        {
-            dates = getMonthTime(beforeNum);
-        }else if (type.equals("daily")){
-            dates = getDayTime(beforeNum);
-        }else if (type.equals("yearly")){
-            dates = getYearTime(beforeNum);
-        }else if (type.equals("weekly")){
-            dates = getWeekTime(beforeNum);
-        }
-        return dates;
-    }
-
-    /**
-     * 获取beforeMonthNum月之前月份的第一天和最后一天的时间
-     * @param beforeMonthNum
-     * @return
-     */
-    private Date[] getMonthTime(int beforeMonthNum){
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MONTH, 0-beforeMonthNum);
-        cal.set(Calendar.DATE, 1);
-        Date[] dates = new Date[2];
-        cal.add(Calendar.HOUR, -cal.getTime().getHours());
-        cal.add(Calendar.MINUTE, -cal.getTime().getMinutes());
-        cal.add(Calendar.SECOND, -cal.getTime().getSeconds());
-        dates[0] = cal.getTime();//要的月份的第一天
-        cal.set(Calendar.DAY_OF_MONTH, Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH));
-        cal.add(Calendar.DATE, 1);
-        dates[1] = cal.getTime();//最后一天
-        return dates;
-    }
-
-
-    private Date[] getYearTime(int yearNum){
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.YEAR, 0-yearNum);
-        cal.set(Calendar.MONTH, 1);
-        cal.set(Calendar.DAY_OF_YEAR, 1);
-
-        cal.add(Calendar.HOUR, -cal.getTime().getHours());
-        cal.add(Calendar.MINUTE, -cal.getTime().getMinutes());
-        cal.add(Calendar.SECOND, -cal.getTime().getSeconds());
-        Date[] dates = new Date[2];
-        dates[0] = cal.getTime();//第一天
-        cal.add(Calendar.DAY_OF_YEAR, Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_YEAR));
-        dates[1] = cal.getTime();//最后一天
-        return dates;
-    }
-
-    private Date[] getDayTime(long dayNum){
-        Calendar calendar = Calendar.getInstance();
-        Date date = new Date();
-        Long time = date.getTime();
-        time -= 86400000 * dayNum;
-        Date date1 = new  Date(time);
-        calendar.setTime(date1);
-        calendar.add(Calendar.HOUR, -calendar.getTime().getHours());
-        calendar.add(Calendar.MINUTE, -calendar.getTime().getMinutes());
-        calendar.add(Calendar.SECOND, -calendar.getTime().getSeconds());
-        Date[] dates = new Date[2];
-        dates[0] = calendar.getTime();
-        calendar.add(Calendar.DATE, 1);
-        dates[1] = calendar.getTime();
-        return dates;
-    }
-
-    private Date[] getWeekTime(long weekNum){
-        Calendar calendar = Calendar.getInstance();
-        Date[] dates = new Date[2];
-        Date date = new Date();
-        Long time = date.getTime() - 86400000 * weekNum * 7;
-        calendar.setTime(new Date(time));
-        calendar.setFirstDayOfWeek(Calendar.SUNDAY);
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-        calendar.add(Calendar.DATE, calendar.getFirstDayOfWeek() - day);
-        calendar.add(Calendar.HOUR, -calendar.getTime().getHours());
-        calendar.add(Calendar.MINUTE, -calendar.getTime().getMinutes());
-        calendar.add(Calendar.SECOND, -calendar.getTime().getSeconds());
-        dates[0] = calendar.getTime();
-        calendar.add(Calendar.DATE, 7);
-        dates[1] = calendar.getTime();
-        return dates;
-    }
-
 
 }

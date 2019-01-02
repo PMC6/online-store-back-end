@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface OrderDAO extends JpaRepository<Order, Long> {
-    Order findByUserId(Long id);
     List<Order> findAllByShopIdAndStatus(Pageable pageable, Long shopId, String status);
     List<Order> findAllByShopIdAndStatus(Long shopId, String status);
     List<Order> findAllByShopName(Pageable pageable, String shopName);
@@ -21,6 +20,7 @@ public interface OrderDAO extends JpaRepository<Order, Long> {
     List<Order> findAllByProductId(Pageable pageable, Long productId);
     int countAllByProductId(Long productId);
     List<Order> findAllByCreateTimeBetween(Date before, Date after);
+    List<Order> findAllByCreateTimeBetween(Pageable pageable, Date before, Date after);
     List<Order> findAllByCreateTimeBetweenAndShopId(Pageable pageable, Date before, Date after, Long shopId);
     List<Order> findAllByCreateTimeBetweenAndShopId(Date before, Date after, Long shopId);
     List<Order> findAllByCreateTimeBetweenAndUserId(Pageable pageable, Date before, Date after, Long userID);

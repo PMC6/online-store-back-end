@@ -8,8 +8,9 @@ package com.fenlan.spring.shop.controller.customer;
 
 import com.fenlan.spring.shop.bean.Order;
 import com.fenlan.spring.shop.bean.ResponseFormat;
-import com.fenlan.spring.shop.controller.seller.ManageOrder;
+import com.fenlan.spring.shop.controller.seller.ManageOrderController;
 import com.fenlan.spring.shop.service.OrderService;
+import com.fenlan.spring.shop.service.TimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,8 @@ public class OrderController {
     OrderService orderService;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    TimeService timeService;
 
     /**
      * 添加订单，需提供Order的数据productName,shopName,number
@@ -82,7 +85,7 @@ public class OrderController {
     /**
      * 按时间区间查看购买历史
      * @param beforeNum
-     * @param type (daily,monthly,yearly)
+     * @param type (daily,weekly,monthly,yearly)
      * @param page
      * @param size
      * @return
@@ -92,7 +95,7 @@ public class OrderController {
                                                       @RequestParam("type") String type,
                                                       @RequestParam("page") int page,
                                                       @RequestParam("size") int size){
-        Date[] dates = new ManageOrder().timeSelector(beforeNum, type);
+        Date[] dates = timeService.timeSelector(beforeNum, type);
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
@@ -159,6 +162,11 @@ public class OrderController {
         }
     }
 
+    /**
+     * 取消订单
+     * @param map
+     * @return
+     */
     @DeleteMapping("/cancel")
     public ResponseEntity<ResponseFormat> cancel(@RequestBody Map map){
         Long id =Long.parseLong(map.get("orderId").toString());
