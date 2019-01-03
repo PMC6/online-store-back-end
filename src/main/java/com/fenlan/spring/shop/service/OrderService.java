@@ -66,6 +66,17 @@ public class OrderService {
         return userDAO.findById(user.getId()).get();
     }
 
+    /**
+     * 查看非取消的订单的数量
+     * @param before
+     * @param after
+     * @return
+     */
+    public int amountOrderBetweenTimes(Date before, Date after){
+        List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndStatusNot(before, after, "Canceled");
+        return orderList.size();
+    }
+
     //seller
     /**
      * 由店铺名字按照createTime排序查找店铺相关订单
@@ -130,6 +141,25 @@ public class OrderService {
         }catch (Exception e){
             throw new Exception(e.getLocalizedMessage());
         }
+    }
+
+    /**
+     * 买家完成订单
+     * @param orderId
+     * @return
+     * @throws Exception
+     */
+    public boolean completeOrder(Long orderId) throws Exception{
+        User user = authUser();
+        Order order = orderDAO.findById(orderId).get();
+        if (order.getUserId() != user.getId()){
+            throw new Exception("this order is not belong to you");
+        }
+        if (order.getStatus().equals("Shipped")){
+            order.setStatus("Complete");
+        }else throw new Exception("you can't update it's status");
+        orderDAO.save(order);
+        return true;
     }
 
     /**
@@ -250,6 +280,50 @@ public class OrderService {
         }
         if (orderList.size() == 0) throw new Exception("no order at this time");
         return orderList;
+    }
+
+    /**
+     * 商家得到某一段时间的订单数量
+     * @param before
+     * @param after
+     * @return
+     * @throws Exception
+     */
+    public int sellerAmountOrderBetweenTimes(Date before, Date after) throws Exception{
+        Shop shop = shopDAO.findByUser(authUser());
+        if (shop == null) throw new Exception("you are not sellers");
+        int num = 0;
+        num = orderDAO.countAllByCreateTimeBetweenAndShopIdAndStatusNot(before,
+                after, shop.getId(), "Canceled");
+        return num;
+    }
+
+    /**
+     * 商家得到某一段时间的几个商品卖出信息
+     * @param before
+     * @param after
+     * @return
+     * @throws Exception
+     */
+    public Map findSalesBetweenTimes(Date before, Date after, List<Long> productIds) throws Exception{
+        Shop shop = shopDAO.findByUser(authUser());
+        if(shop == null) throw new Exception("you are not sellers");
+        List<Order> orderList = null;
+        Map<String, Double> map = new LinkedHashMap();
+        for (Long id : productIds){
+            orderList = orderDAO.findAllByCreateTimeBetweenAndProductIdAndStatus(before, after, id,
+                    "Complete");
+            double num = 0;
+            double sales = 0.0;
+            for (Order order : orderList){
+                sales += order.getPrice() - order.getCommission();
+                num += order.getNumber();
+            }
+            map.put(""+id+"sales",sales);
+            map.put(""+id+"num", num);
+        }
+
+        return map;
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.fenlan.spring.shop.bean;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,12 +15,13 @@ public class Advertisement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Shop shop;
-    @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
+    @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Product product;
     private Double fee;
-    @Column(columnDefinition = "TEXT")
     private String image;
     @CreatedDate
     private Date createTime;

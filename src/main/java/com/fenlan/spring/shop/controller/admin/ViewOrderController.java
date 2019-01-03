@@ -53,6 +53,18 @@ public class ViewOrderController {
         }
     }
 
+    @GetMapping("/amount")
+    public ResponseEntity<ResponseFormat> amountOrders(@RequestParam("beforeNum") int beforeNum,
+                                                       @RequestParam("type") String type){
+        Date[] dates = timeService.timeSelector(beforeNum, type);
+        return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                .error(null)
+                .message("query success")
+                .path(request.getServletPath())
+                .data(orderService.amountOrderBetweenTimes(dates[0], dates[1]))
+                .build(), HttpStatus.OK);
+    }
+
     @GetMapping("/search")
     public ResponseEntity<ResponseFormat> searchOrder(@RequestParam("orderId") Long orderId){
         try {

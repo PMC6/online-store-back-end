@@ -221,6 +221,34 @@ public class ManageOrderController {
     }
 
     /**
+     * 按时间区间查看订单数量
+     * @param beforeNum 几天(月、年)前，0表示当天(月、年)
+     * @param type 类型(daily,monthly,yearly)
+     * @return
+     */
+    @GetMapping("/order/amountByTime")
+    public ResponseEntity<ResponseFormat> amountOrders(@RequestParam("beforeNum") int beforeNum,
+                                                     @RequestParam("type") String type){
+        Date[] dates = null;
+        dates = timeService.timeSelector(beforeNum, type);
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("query success")
+                    .path(request.getServletPath())
+                    .data(orderService.sellerAmountOrderBetweenTimes(dates[0], dates[1]))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * 按时间区间查看销售额
      * @param beforeNum 几天(月、年)前，0表示当天(月、年)
      * @param type 类型(daily,monthly,yearly)

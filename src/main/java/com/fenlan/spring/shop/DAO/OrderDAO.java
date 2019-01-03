@@ -21,8 +21,12 @@ public interface OrderDAO extends JpaRepository<Order, Long> {
     int countAllByProductIdAndStatusNot(Long productId, String status);
     List<Order> findAllByCreateTimeBetweenAndStatus(Date before, Date after, String status);
     List<Order> findAllByCreateTimeBetweenAndStatusNot(Pageable pageable, Date before, Date after, String status);
+    List<Order> findAllByCreateTimeBetweenAndStatusNot(Date before, Date after, String status);
+    int countAllByCreateTimeBetweenAndShopIdAndStatusNot(Date before, Date after, Long shopId, String status);
     List<Order> findAllByCreateTimeBetweenAndShopIdAndStatusNot(Pageable pageable, Date before, Date after,
                                                                 Long shopId, String status);
+    List<Order> findAllByCreateTimeBetweenAndProductIdAndStatus(Date before, Date after,
+                                                                Long productId, String status);
     List<Order> findAllByCreateTimeBetweenAndShopIdAndStatus(Date before, Date after, Long shopId, String status);
     List<Order> findAllByCreateTimeBetweenAndUserIdAndStatus(Pageable pageable, Date before, Date after,
                                                                Long userID, String status);
