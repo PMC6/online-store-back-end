@@ -126,18 +126,38 @@ public class AdService {
         return sales;
     }
 
-//    public double findSales(Date before, Date after, int page, int size) throws Exception{
-//        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-//        List<Advertisement> list = null;
-//        if (before != null && after != null) {
-//            list = advertisementDAO.findAllByCreateTimeBetween(pageable, before, after);
-//        }else throw new Exception("there need two date");
-//        double sales = 0.0;
-//        for (Advertisement advertisement : list){
-//            sales += advertisement.getFee();
-//        }
-//        return sales;
-//    }
+    /**
+     * 商家一段时间的广告花费
+     * @param before
+     * @param after
+     * @return
+     */
+    public double findPayment(Date before, Date after) throws Exception{
+        User user = authUser();
+        Shop shop = shopDAO.findByUser(user);
+        if (shop == null) throw new Exception("you are not sellers");
+        List<Advertisement> list = null;
+        if (before != null && after != null){
+            list = advertisementDAO.findAllByCreateTimeBetweenAndShopId(before, after, shop.getId());
+            List<Product> productList = productDAO.findAllByShopId(shop.getId());
+            for (Product product : productList){
+                list.addAll(advertisementDAO.findAllByCreateTimeBetweenAndProductId(before, after, product.getId()));
+            }
+        }else {
+            //添加查找全部的
+            list = advertisementDAO.findByShopId(shop.getId());
+            List<Product> productList = productDAO.findAllByShopId(shop.getId());
+            for (Product product : productList){
+                list.addAll(advertisementDAO.findByProductId(product.getId()));
+            }
+        }
+        if (list.size() == 0) return 0.0;
+        double sales = 0.0;
+        for (Advertisement advertisement : list){
+            sales += advertisement.getFee();
+        }
+        return sales;
+    }
 
     private Advertisement approve(AdRequest request) throws Exception {
         Long amountOfProduct = advertisementDAO.countByCreateTimeGreaterThanEqualAndProductNotNull(today());

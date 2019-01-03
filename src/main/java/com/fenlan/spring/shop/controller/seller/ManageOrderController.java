@@ -23,6 +23,7 @@ import javax.xml.crypto.Data;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/seller")
@@ -39,16 +40,16 @@ public class ManageOrderController {
     ShopService shopService;
     @Autowired
     TimeService timeService;
+    @Autowired
+    AdService adService;
 
     /**
      * 商家更新订单状态
      * @param orderId
-     * @param status
      * @return
      */
     @PutMapping("/order/update")
-    public ResponseEntity<ResponseFormat> updateOrderStatus(@RequestParam("orderId") Long orderId,
-                                                            @RequestParam("status") String status){
+    public ResponseEntity<ResponseFormat> updateOrderStatus(@RequestParam("orderId") Long orderId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         User user = userService.findByName(userName);
@@ -57,7 +58,7 @@ public class ManageOrderController {
                     .error(null)
                     .message("update success")
                     .path(request.getServletPath())
-                    .data(orderService.updateOrderStatus(orderId, status, user))
+                    .data(orderService.updateOrderStatus(orderId, user))
                     .build(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -70,7 +71,7 @@ public class ManageOrderController {
     }
 
     /**
-     * 查看订单
+     * 查看订单,没有被取消的订单
      * @param page
      * @param size
      * @param positive
@@ -247,6 +248,55 @@ public class ManageOrderController {
     }
 
     /**
+     * 按时间区间查看广告花费
+     * @param beforeNum 几天(月、年)前，0表示当天(月、年)
+     * @param type 类型(daily,monthly,yearly)
+     * @return
+     */
+    @GetMapping("/order/findPayment")
+    public ResponseEntity<ResponseFormat> findPayment(@RequestParam("beforeNum") int beforeNum,
+                                                   @RequestParam("type") String type){
+        Date[] dates = timeService.timeSelector(beforeNum, type);
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("query success")
+                    .path(request.getServletPath())
+                    .data(adService.findPayment(dates[0], dates[1]))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(0)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 查看所有广告花费
+     * @return
+     */
+    @GetMapping("/order/findAllPayment")
+    public ResponseEntity<ResponseFormat> findAllPayment(){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("query success")
+                    .path(request.getServletPath())
+                    .data(adService.findPayment(null, null))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(0)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    /**
      * 查看某件商品的订单信息
      * @param productName
      * @param page
@@ -294,6 +344,32 @@ public class ManageOrderController {
                     .message(e.getLocalizedMessage())
                     .path(request.getServletPath())
                     .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 按时间区间查看销售额
+     * @param beforeNum 几天(月、年)前，0表示当天(月、年)
+     * @return
+     */
+    @GetMapping("/order/findDailySale")
+    public ResponseEntity<ResponseFormat> findWeeklySale(@RequestParam("beforeNum") int beforeNum){
+        Date[] dates = timeService.timeSelector(beforeNum, "weekly");
+        try {
+            Map map = orderService.listDailySales(dates[0], dates[1]);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("query success")
+                    .path(request.getServletPath())
+                    .data(map)
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(0)
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -6,14 +6,9 @@
  */
 package com.fenlan.spring.shop.service;
 
-import com.fenlan.spring.shop.DAO.OrderDAO;
-import com.fenlan.spring.shop.DAO.ProductDAO;
-import com.fenlan.spring.shop.DAO.ShopDAO;
-import com.fenlan.spring.shop.DAO.UserDAO;
-import com.fenlan.spring.shop.bean.Order;
-import com.fenlan.spring.shop.bean.Product;
-import com.fenlan.spring.shop.bean.Shop;
-import com.fenlan.spring.shop.bean.User;
+import com.fenlan.spring.shop.DAO.*;
+import com.fenlan.spring.shop.bean.*;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -35,6 +28,10 @@ public class OrderService {
     ProductDAO productDAO;
     @Autowired
     UserDAO userDAO;
+    @Autowired
+    CommissionService commissionService;
+    @Autowired
+    CartDAO cartDAO;
 
     //admin
     public Order findById(Long orderId) throws Exception{
@@ -55,9 +52,8 @@ public class OrderService {
     public double findMailIncome(Date before, Date after){
         List<Order> list = null;
         if (before == null && after== null){
-            list = orderDAO.findAll();
-
-        }else list = orderDAO.findAllByCreateTimeBetween(before, after);
+            list = orderDAO.findAllByStatus("Complete");
+        }else list = orderDAO.findAllByCreateTimeBetweenAndStatus(before, after, "Complete");
         double sale = 0.0;
         for (Order order : list){
             sale += order.getCommission();
@@ -86,7 +82,7 @@ public class OrderService {
         if (positive) {
             pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
         }else pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createTime"));
-        List<Order> orderList = orderDAO.findAllByShopName(pageable, shop.getName());
+        List<Order> orderList = orderDAO.findAllByShopNameAndStatusNot(pageable, shop.getName(), "Canceled");
         if (orderList.size() == 0) throw new Exception("no result with this page");
         return orderList;
     }
@@ -110,17 +106,24 @@ public class OrderService {
     /**
      * 商家更改订单状态
      * @param orderId
-     * @param status
      * @return
      * @throws Exception
      */
-    public boolean updateOrderStatus(Long orderId, String status, User user) throws Exception{
+    public boolean updateOrderStatus(Long orderId, User user) throws Exception{
 
+        String status = null;
         try {
             Order order = orderDAO.findById(orderId).get();
             Shop shop = shopDAO.findByUser(user);
             if (shop == null || !shop.getId().equals(order.getShopId()))
                 throw new Exception("you are not authorized to update this order");
+            if (order.getStatus().equals("Processing Order")){
+                status = "Preparing for Shipment";
+            }else if (order.getStatus().equals("Preparing for Shipment")){
+                status = "Shipped";
+            }else if (order.getStatus().equals("Shipped")){
+                status = "Complete";
+            }else throw new Exception("can't update current status");
             order.setStatus(status);
             orderDAO.save(order);
             return true;
@@ -148,8 +151,26 @@ public class OrderService {
             }
         }
         if (!authoity) throw new Exception("you are not authorized to cancel this order");
-        order.setStatus("canceled");
+        if (!order.getStatus().equals("Processing Order")) throw new Exception("can't be canceled");
+        order.setStatus("Canceled");
         orderDAO.save(order);
+        return true;
+    }
+
+    /**
+     * 取消订单
+     * @return
+     */
+    public boolean deleteOrder(Long orderId, User user) throws Exception{
+        if (user == null) user = authUser();
+        Order order = orderDAO.findById(orderId).get();
+        boolean authoity = false;
+        if (user.getId().equals(order.getUserId())){
+            //删除订单的是买家
+            authoity = true;
+        }else throw new Exception("can't delete it");
+        if (!authoity) throw new Exception("you are not authorized to cancel this order");
+        orderDAO.delete(order);
         return true;
     }
 
@@ -160,7 +181,7 @@ public class OrderService {
      */
     public List<Order> productSales(Long productId, int page, int size) throws Exception{
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-        List<Order> orderList = orderDAO.findAllByProductId(pageable, productId);
+        List<Order> orderList = orderDAO.findAllByProductIdAndStatusNot(pageable, productId, "Canceled");
         if (orderList.size() == 0) throw new Exception("no result");
         return orderList;
     }
@@ -171,7 +192,7 @@ public class OrderService {
      * @return
      */
     public int amountProductSales(Long productId){
-        return orderDAO.countAllByProductId(productId);
+        return orderDAO.countAllByProductIdAndStatusNot(productId, "Canceled");
     }
 
     /**
@@ -184,7 +205,8 @@ public class OrderService {
     public double findSaleBetweenTimes(Date before, Date after) throws Exception{
         Shop shop = shopDAO.findByUser(authUser());
         if (shop == null) throw new Exception("you are not sellers");
-        List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndShopId(before, after, shop.getId());
+        List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndShopIdAndStatus(before, after, shop.getId(),
+                "Complete");
         double sale = 0.0;
         for (Order order : orderList){
             sale += order.getPrice() - order.getCommission();
@@ -201,7 +223,7 @@ public class OrderService {
         User user = authUser();
         Shop shop = shopDAO.findByUser(user);
         if (shop == null) throw new Exception("you are not sellers");
-        List<Order> orderList = orderDAO.findAllByShopIdAndStatus(shop.getId(), "complete");
+        List<Order> orderList = orderDAO.findAllByShopIdAndStatus(shop.getId(), "Complete");
         double sale = 0.0;
         for (Order order : orderList){
             sale += order.getPrice() - order.getCommission();
@@ -221,9 +243,10 @@ public class OrderService {
         Shop shop = shopDAO.findByUser(authUser());
         List<Order> orderList = null;
         if (shop == null) {
-            orderList = orderDAO.findAllByCreateTimeBetween(pageable, before, after);
+            orderList = orderDAO.findAllByCreateTimeBetweenAndStatusNot(pageable, before, after, "Canceled");
         }else {
-            orderList = orderDAO.findAllByCreateTimeBetweenAndShopId(pageable, before, after, shop.getId());
+            orderList = orderDAO.findAllByCreateTimeBetweenAndShopIdAndStatusNot(pageable, before, after,
+                    shop.getId(), "Canceled");
         }
         if (orderList.size() == 0) throw new Exception("no order at this time");
         return orderList;
@@ -239,11 +262,41 @@ public class OrderService {
         if (shop == null) throw new Exception("you are not sellers");
         if (status == null){
             //所有订单数量
-            return orderDAO.countAllByShopId(shop.getId());
+            return orderDAO.countAllByShopIdAndStatusNot(shop.getId(), "Canceled");
         }
         return orderDAO.countAllByShopIdAndStatus(shop.getId(), status);
     }
 
+    /**
+     * 得到before和after间每天的销售额
+     * @param before
+     * @param after
+     * @return
+     */
+    public Map<Integer, Double> listDailySales(Date before, Date after) throws Exception{
+        User user = authUser();
+        Shop shop = shopDAO.findByUser(user);
+        if (shop == null) throw new Exception("you are not sellers");
+        Map map = new TreeMap();
+        List<Order> orderList = null;
+        Calendar calendar = Calendar.getInstance();
+        for (int i = 0;i < 7;i++){
+            calendar.setTime(before);
+            calendar.add(Calendar.DATE, 1);
+            Date tmp = calendar.getTime();
+            double sales = 0.0;
+            if (tmp.getTime() < after.getTime()){
+                orderList = orderDAO.findAllByCreateTimeBetweenAndShopIdAndStatus(before, tmp,
+                        shop.getId(), "Complete");
+                for (Order order : orderList){
+                    sales += order.getPrice() - order.getCommission();
+                }
+            }
+            before = tmp;
+            map.put(i, sales);
+        }
+        return map;
+    }
 
     //买家
     /**
@@ -256,7 +309,7 @@ public class OrderService {
     public List<Order> listByUser(int page, int size) throws Exception{
         User user = authUser();
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-        List<Order> orderList = orderDAO.findAllByUserId(pageable, user.getId());
+        List<Order> orderList = orderDAO.findAllByUserIdAndStatusNot(pageable, user.getId(), "Canceled");
         if (orderList.size() == 0) throw new Exception("no order being found");
         return orderList;
     }
@@ -270,7 +323,7 @@ public class OrderService {
     public int amountUserOrder(String status) throws Exception{
         User user = authUser();
         if (status == null){
-            return orderDAO.countAllByUserId(user.getId());
+            return orderDAO.countAllByUserIdAndStatusNot(user.getId(), "Canceled");
         }
         return orderDAO.countAllByUserIdAndStatus(user.getId(), status);
     }
@@ -287,7 +340,8 @@ public class OrderService {
     public List<Order> customerFindOrderBetweenTimes(Date before, Date after, int page, int size) throws Exception{
         User user = authUser();
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
-        List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndUserId(pageable, before, after, user.getId());
+        List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndUserIdAndStatus(pageable, before,
+                after, user.getId(), "Complete");
         if (orderList.size() == 0) throw new Exception("no order at this time");
         return orderList;
     }
@@ -333,10 +387,17 @@ public class OrderService {
         order.setPrice(product.getPrice());
         if (order.getNumber() == 0) throw new Exception("the num of product can't be zero");
         order.setTotalPrice(product.getPrice() * order.getNumber());
-        order.setCommissionRate(0.02);//怎么获得？
+        order.setCommissionRate(commissionService.findLastCommissionRate());
         order.setCommission(order.getTotalPrice() * order.getCommissionRate());
-        order.setStatus("place");//买家下订单
+        order.setStatus("Processing Order");//买家下订单
+        Cart cart = cartDAO.findByUserIdAndProductId(user.getId(), product.getId());
+        cartDAO.delete(cart);
+        int left = product.getNumber()-1;
+        if (left < 0) throw new Exception("no product left");
+        product.setNumber(left);
+        productDAO.save(product);
         orderDAO.save(order);
         return true;
     }
+
 }
