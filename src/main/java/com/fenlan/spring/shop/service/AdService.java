@@ -108,6 +108,57 @@ public class AdService {
                 .findByCreateTimeGreaterThanEqualAndShopNotNullOrderByFeeDesc(yesterday());
     }
 
+    /**
+     * 查看Mail一段时间内的广告收入
+     * @param before
+     * @param after
+     * @return
+     */
+    public double findSales(Date before, Date after){
+        List<Advertisement> list = null;
+        if (before != null && after != null) {
+            list = advertisementDAO.findAllByCreateTimeBetween(before, after);
+        }else list = advertisementDAO.findAll();
+        double sales = 0.0;
+        for (Advertisement advertisement : list){
+            sales += advertisement.getFee();
+        }
+        return sales;
+    }
+
+    /**
+     * 商家一段时间的广告花费
+     * @param before
+     * @param after
+     * @return
+     */
+    public double findPayment(Date before, Date after) throws Exception{
+        User user = authUser();
+        Shop shop = shopDAO.findByUser(user);
+        if (shop == null) throw new Exception("you are not sellers");
+        List<Advertisement> list = null;
+        if (before != null && after != null){
+            list = advertisementDAO.findAllByCreateTimeBetweenAndShopId(before, after, shop.getId());
+            List<Product> productList = productDAO.findAllByShopId(shop.getId());
+            for (Product product : productList){
+                list.addAll(advertisementDAO.findAllByCreateTimeBetweenAndProductId(before, after, product.getId()));
+            }
+        }else {
+            //添加查找全部的
+            list = advertisementDAO.findByShopId(shop.getId());
+            List<Product> productList = productDAO.findAllByShopId(shop.getId());
+            for (Product product : productList){
+                list.addAll(advertisementDAO.findByProductId(product.getId()));
+            }
+        }
+        if (list.size() == 0) return 0.0;
+        double sales = 0.0;
+        for (Advertisement advertisement : list){
+            sales += advertisement.getFee();
+        }
+        return sales;
+    }
+
     private Advertisement approve(AdRequest request) throws Exception {
         Long amountOfProduct = advertisementDAO.countByCreateTimeGreaterThanEqualAndProductNotNull(today());
         Long amountOfShop = advertisementDAO.countByCreateTimeGreaterThanEqualAndShopNotNull(today());
@@ -145,4 +196,5 @@ public class AdService {
         Date date = format.parse(yesterday + " 00:00:00");
         return date;
     }
+
 }

@@ -61,7 +61,7 @@ public class CommentService {
         Order order = orderDAO.findById(orderId).get();
         User user = authUser();
         if (!order.getUserId().equals(user.getId())) throw new Exception("this order is not yours");
-        if (!order.getStatus().equals("complete")) throw new Exception("this order has not been completed");
+        if (!order.getStatus().equals("Complete")) throw new Exception("this order has not been completed");
         Shop shop = shopDAO.findById(order.getShopId()).get();
         Product product = productDAO.findById(order.getProductId()).get();
         try {

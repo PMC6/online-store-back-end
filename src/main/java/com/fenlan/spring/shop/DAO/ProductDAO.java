@@ -11,7 +11,9 @@ public interface ProductDAO extends JpaRepository<Product, Long> {
     List<Product> findByName(Pageable pageable, String name);
     List<Product> findByNameAndCategoryId(Pageable pageable, String name, Long id);
     Product findByNameAndShop(String name, Shop shop);
+    List<Product> findAllByNameLikeAndShop(Pageable pageable, String name, Shop shop);
     List<Product> findAllByShopId(Pageable pageable, Long id);
+    List<Product> findAllByShopId(Long id);
     List<Product> findAllByShopIdAndNameContaining(Pageable pageable, Long id, String name);
     List<Product> findAllByNameContaining(Pageable pageable, String name);
     List<Product> findAllByNameContainingAndCategoryId(Pageable pageable, String name, Long id);

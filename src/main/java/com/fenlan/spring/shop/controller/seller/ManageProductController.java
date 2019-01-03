@@ -145,9 +145,11 @@ public class ManageProductController {
     }
 
     @GetMapping("/product/search")
-    public ResponseEntity<ResponseFormat> search(@RequestParam("name") String name) {
+    public ResponseEntity<ResponseFormat> search(@RequestParam("name") String name,
+                                                 @RequestParam("page") int page,
+                                                 @RequestParam("size") int size) {
         try {
-            Product product = productService.findByNamAndShop(name);
+            List<Product> product = productService.findByNameAndShop(name, page, size);
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
                     .message("search success")

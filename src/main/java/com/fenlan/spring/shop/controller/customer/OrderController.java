@@ -8,8 +8,9 @@ package com.fenlan.spring.shop.controller.customer;
 
 import com.fenlan.spring.shop.bean.Order;
 import com.fenlan.spring.shop.bean.ResponseFormat;
-import com.fenlan.spring.shop.controller.seller.ManageOrder;
+import com.fenlan.spring.shop.controller.seller.ManageOrderController;
 import com.fenlan.spring.shop.service.OrderService;
+import com.fenlan.spring.shop.service.TimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,8 @@ public class OrderController {
     OrderService orderService;
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    TimeService timeService;
 
     /**
      * 添加订单，需提供Order的数据productName,shopName,number
@@ -57,11 +60,34 @@ public class OrderController {
     }
 
     /**
-     * 查询买家订单数量
+     * 查询买家已完成订单数量
      * @return
      */
     @GetMapping("/amount")
     public ResponseEntity<ResponseFormat> amountCompletedOrder(){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("query success")
+                    .path(request.getServletPath())
+                    .data(orderService.amountUserOrder("complete"))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 查询买家全部订单数量,除取消了的
+     * @return
+     */
+    @GetMapping("/amount/total")
+    public ResponseEntity<ResponseFormat> amountTotalOrder(){
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
@@ -80,9 +106,9 @@ public class OrderController {
     }
 
     /**
-     * 按时间区间查看购买历史
+     * 按时间区间查看购买历史,只有已完成的
      * @param beforeNum
-     * @param type (daily,monthly,yearly)
+     * @param type (daily,weekly,monthly,yearly)
      * @param page
      * @param size
      * @return
@@ -92,7 +118,7 @@ public class OrderController {
                                                       @RequestParam("type") String type,
                                                       @RequestParam("page") int page,
                                                       @RequestParam("size") int size){
-        Date[] dates = new ManageOrder().timeSelector(beforeNum, type);
+        Date[] dates = timeService.timeSelector(beforeNum, type);
         try {
             return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
                     .error(null)
@@ -111,6 +137,24 @@ public class OrderController {
 
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<ResponseFormat> completeOrder(@RequestParam("orderId") Long orderId){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("complete success")
+                    .path(request.getServletPath())
+                    .data(orderService.completeOrder(orderId))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("complete failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping("/list")
     public ResponseEntity<ResponseFormat> list(@RequestParam("page") int page,
                                                @RequestParam("size") int size){
@@ -159,6 +203,11 @@ public class OrderController {
         }
     }
 
+    /**
+     * 取消订单
+     * @param map
+     * @return
+     */
     @DeleteMapping("/cancel")
     public ResponseEntity<ResponseFormat> cancel(@RequestBody Map map){
         Long id =Long.parseLong(map.get("orderId").toString());
@@ -178,4 +227,31 @@ public class OrderController {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    /**
+     * 取消订单
+     * @param map
+     * @return
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseFormat> delete(@RequestBody Map map){
+        Long id =Long.parseLong(map.get("orderId").toString());
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("delete success")
+                    .path(request.getServletPath())
+                    .data(orderService.deleteOrder(id, null))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("delete failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }
