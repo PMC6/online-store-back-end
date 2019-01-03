@@ -336,10 +336,11 @@ public class IndexController {
     // 暂定
     @PostMapping("/advertisement/upload")
     public ResponseEntity<ResponseFormat> uploads(@RequestParam("name") MultipartFile file) {
+        String fileName = null;
         try {
-            String fileName = System.currentTimeMillis()+file.getOriginalFilename();
+            fileName = System.currentTimeMillis()+file.getOriginalFilename();
             byte[] bytes = file.getBytes();
-            Path path = Paths.get("/home/fenlan/Pictures/"+fileName);
+            Path path = Paths.get("/root/Picture/image/static/image/"+fileName);
             Files.write(path, bytes);
         } catch (IOException e) {
             e.printStackTrace();
@@ -348,7 +349,7 @@ public class IndexController {
                 .error(null)
                 .message("get shop advertisement list")
                 .path(request.getServletPath())
-                .data(null)
+                .data("http://39.98.165.19:8084/static/image/"+fileName)
                 .build(), HttpStatus.OK);
     }
 }
