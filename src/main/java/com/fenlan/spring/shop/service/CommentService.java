@@ -38,12 +38,10 @@ public class CommentService {
     /**
      * 通过productId得到商品相关评论
      * @param productId
-     * @param page
-     * @param size
      * @return
      */
-    public List<Comment> listByProductId(int page, int size, Long productId) throws Exception{
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createTime"));
+    public List<Comment> listByProductId(Long productId) throws Exception{
+        Pageable pageable = PageRequest.of(0,1000, Sort.by(Sort.Direction.DESC, "createTime"));
         List<Comment> comments = commentDAO.findAllByProductId(pageable, productId);
         if (comments.size() == 0) throw new Exception("no result with this page");
         return comments;

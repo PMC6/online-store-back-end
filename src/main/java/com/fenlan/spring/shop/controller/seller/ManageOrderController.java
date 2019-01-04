@@ -45,11 +45,12 @@ public class ManageOrderController {
 
     /**
      * 商家更新订单状态
-     * @param orderId
      * @return
      */
     @PutMapping("/order/update")
-    public ResponseEntity<ResponseFormat> updateOrderStatus(@RequestParam("orderId") Long orderId){
+//    public ResponseEntity<ResponseFormat> updateOrderStatus(@RequestParam("orderId") Long orderId){
+    public ResponseEntity<ResponseFormat> updateOrderStatus(@RequestBody Map map){
+        Long orderId = Long.parseLong(map.get("orderId").toString());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         User user = userService.findByName(userName);
@@ -134,11 +135,11 @@ public class ManageOrderController {
 
     /**
      * 取消订单(卖家or买家)
-     * @param orderId
      * @return
      */
-    @PutMapping("/order/cancelOrder")
-    public ResponseEntity<ResponseFormat> cancelOrder(@RequestParam("orderId") Long orderId){
+    @PutMapping("/order/cancel")
+    public ResponseEntity<ResponseFormat> cancelOrder(@RequestBody Map map){
+        Long orderId = Long.parseLong(map.get("orderId").toString());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         User user = userService.findByName(userName);

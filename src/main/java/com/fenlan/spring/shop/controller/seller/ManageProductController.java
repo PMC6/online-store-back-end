@@ -408,7 +408,7 @@ public class ManageProductController {
     }
 
     /**
-     * 通过产品名得到商品销售数量
+     * 通过产品名得到商品订单数量
      * @param productName
      * @return
      */
