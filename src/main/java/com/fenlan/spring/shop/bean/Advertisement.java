@@ -15,6 +15,7 @@ public class Advertisement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @ManyToOne(cascade = {CascadeType.MERGE}, fetch = FetchType.EAGER)
     @NotFound(action = NotFoundAction.IGNORE)
     private Shop shop;
