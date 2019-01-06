@@ -471,10 +471,10 @@ public class OrderService {
 
     public Product findProductInfo(Long orderId) throws Exception{
         Order order = orderDAO.findById(orderId).get();
-        Product product = productDAO.findById(order.getProductId()).get();
+        Product product = new Product();
         User user = userDAO.findByUsername(order.getUserName());
-
-        Shop shop = product.getShop();
+        if (user == null) throw new Exception("order error");
+        Shop shop = new Shop();
         shop.setUser(user);
         product.setShop(shop);
         return product;
