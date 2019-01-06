@@ -38,11 +38,10 @@ public class ShopApplicationTests {
     @Autowired
     CategoryDAO categoryDAO;
 
-    @Test
+
     public void contextLoads() {
     }
 
-    @Test
     public void registerAdmin() {
         if (null != userDAO.findByUsername("root"))
             try {
@@ -63,7 +62,6 @@ public class ShopApplicationTests {
         }
     }
 
-    @Test
     public void addRoles() {
         SysRole admin = new SysRole();
         admin.setName("ROLE_ADMIN");
@@ -76,22 +74,11 @@ public class ShopApplicationTests {
         sysRoleDAO.save(customer);
     }
 
-    @Test
     public void addCategory() {
         List<String> list = Arrays.asList("TV& Home Theater",
                 "Computers & Tablets", "Cell Phones", "Cameras & Camcorders",
                 "Audio", "Car Electronics & GPS", "Video, Games, Movies & Music",
                 "Health, Fitness & Sports", "Home & Office");
-        for (String item : list) {
-            Category category = new Category();
-            category.setName(item);
-            categoryDAO.save(category);
-        }
-    }
-
-    @Test
-    public void addTwoCategories(){
-        List<String> list = Arrays.asList("Clothes & Shoes", "Books");
         for (String item : list) {
             Category category = new Category();
             category.setName(item);
