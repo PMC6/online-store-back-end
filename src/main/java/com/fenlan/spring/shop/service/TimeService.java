@@ -28,6 +28,53 @@ public class TimeService {
         return dates;
     }
 
+    public Date getDate(String date, String type) throws Exception{
+        if (type.equals("daily")){
+            if (date.length() < 6) throw new Exception("date is lose");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, Integer.parseInt(date.substring(0, 4)));
+            calendar.set(Calendar.MONTH, Integer.parseInt(date.substring(4, 6)) - 1);
+            calendar.set(Calendar.DATE, Integer.parseInt(date.substring(6, 8)));
+            calendar = setTimeZero(calendar);
+            return calendar.getTime();
+        }else if (type.equals("weekly")){
+            if (date.length() != 8) throw new Exception("date is not complete");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, Integer.parseInt(date.substring(0, 4)));
+            calendar.set(Calendar.MONTH, Integer.parseInt(date.substring(4, 6)) - 1);
+            calendar.set(Calendar.DATE, Integer.parseInt(date.substring(6,8)));
+            for (;!calendar.getTime().toString().substring(0,3).equals("Sun");){
+                calendar.add(Calendar.DATE, -1);
+            }
+            calendar = setTimeZero(calendar);
+            return calendar.getTime();
+        }else if (type.equals("monthly")){
+            if (date.length() < 6) throw new Exception("date is not complete");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, Integer.parseInt(date.substring(0, 4)));
+            calendar.set(Calendar.MONTH, Integer.parseInt(date.substring(4, 6)) - 1);
+            calendar.set(Calendar.DATE, 1);
+            calendar = setTimeZero(calendar);
+            return calendar.getTime();
+        }else if (type.equals("yearly")){
+            if (date.length() < 4) throw new Exception("date is not complete");
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, Integer.parseInt(date.substring(0, 4)));
+            calendar.set(Calendar.MONTH, 0);
+            calendar.set(Calendar.DATE, 1);
+            calendar = setTimeZero(calendar);
+            return calendar.getTime();
+        }
+        return null;
+    }
+
+    private Calendar setTimeZero(Calendar calendar){
+        calendar.add(Calendar.HOUR, -calendar.getTime().getHours());
+        calendar.add(Calendar.MINUTE, -calendar.getTime().getMinutes());
+        calendar.add(Calendar.SECOND, -calendar.getTime().getSeconds());
+        return calendar;
+    }
+
     /**
      * 获取beforeMonthNum月之前月份的第一天和最后一天的时间
      * @param beforeMonthNum

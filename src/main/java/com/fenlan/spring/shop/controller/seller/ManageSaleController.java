@@ -141,4 +141,26 @@ public class ManageSaleController {
                     .build(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/calByTime")
+    public ResponseEntity<ResponseFormat> calByTime(@RequestParam("date") String date,
+                                                    @RequestParam("type") String type){
+        try {
+            Date date1 = timeService.getDate(date, type);
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("query success")
+                    .path(request.getServletPath())
+                    .data(salesService.salesSelector(date1, type))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(0)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 }

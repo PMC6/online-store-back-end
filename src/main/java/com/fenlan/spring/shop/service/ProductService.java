@@ -199,6 +199,15 @@ public class ProductService {
         return result;
     }
 
+    public int amountByNameAndShop(String name) throws Exception {
+        Shop shop = shopDAO.findByUser(authUser());
+        if (shop == null) throw new Exception("you are not sellers");
+        int result = productDAO.countAllByNameLikeAndShop("%"+name+"%", shop);
+        if (result == 0)
+            throw new Exception("not found this product");
+        return result;
+    }
+
     /**
      * 得到应用于商店主页的所有广告商品
      * @param shopId

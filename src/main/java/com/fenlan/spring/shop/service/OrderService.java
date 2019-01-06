@@ -183,6 +183,9 @@ public class OrderService {
         if (!authoity) throw new Exception("you are not authorized to cancel this order");
         if (!order.getStatus().equals("Processing Order")) throw new Exception("can't be canceled");
         order.setStatus("Canceled");
+        Product product = productDAO.findById(order.getProductId()).get();
+        product.setNumber(product.getNumber()+order.getNumber());
+        productDAO.save(product);
         orderDAO.save(order);
         return true;
     }
@@ -256,7 +259,7 @@ public class OrderService {
         List<Order> orderList = orderDAO.findAllByShopIdAndStatus(shop.getId(), "Complete");
         double sale = 0.0;
         for (Order order : orderList){
-            sale += order.getPrice() - order.getCommission();
+            sale += order.getTotalPrice() - order.getCommission();
         }
         return sale;
     }
@@ -375,6 +378,14 @@ public class OrderService {
         return orderDAO.countAllByUserIdAndStatus(user.getId(), status);
     }
 
+    public int amountOrdersByTimes(Date before, Date after){
+        User user = authUser();
+        int num = 0;
+        num = orderDAO.countAllByUserIdAndStatusAndCreateTimeBetween(user.getId(), "Complete", before,
+                after);
+        return num;
+    }
+
     /**
      * 买家查看一段时间内已经完成的订单
      * @param before
@@ -429,6 +440,13 @@ public class OrderService {
         order.setProductId(product.getId());
         User user = userDAO.findByUsername(userName);
         if (user == null) throw new Exception("the user isn't login");
+        if (user.getAddress() == null || user.getAddress().equals("")){
+            throw new Exception("Please add the receiving address");
+        }
+        if (user.getTelephone() == null || user.getTelephone().equals("")){
+            throw new Exception("Please add the your phone number");
+        }
+
         order.setUserId(user.getId());
         order.setUserName(userName);
         order.setPrice(product.getPrice());
@@ -443,12 +461,24 @@ public class OrderService {
         }catch (Exception e){
 
         }
-        int left = product.getNumber()-1;
+        int left = product.getNumber()-order.getNumber();
         if (left < 0) throw new Exception("no product left");
         product.setNumber(left);
         productDAO.save(product);
         orderDAO.save(order);
         return true;
+    }
+
+    public Product findProductInfo(Long orderId) throws Exception{
+        Order order = orderDAO.findById(orderId).get();
+        Product product = productDAO.findById(order.getProductId()).get();
+        User user = userDAO.findByUsername(order.getUserName());
+
+        Shop shop = product.getShop();
+        shop.setUser(user);
+        product.setShop(shop);
+        return product;
+
     }
 
 }

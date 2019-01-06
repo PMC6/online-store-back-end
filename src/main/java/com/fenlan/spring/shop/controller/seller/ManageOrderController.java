@@ -403,4 +403,26 @@ public class ManageOrderController {
         }
     }
 
+    /**
+     * 查看某个订单商品信息
+     * @return
+     */
+    @GetMapping("/order/findProductInfo")
+    public ResponseEntity<ResponseFormat> findInfo(@RequestParam("orderId") Long orderId){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("find success")
+                    .path(request.getServletPath())
+                    .data(orderService.findProductInfo(orderId))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("find failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -14,6 +14,8 @@ import com.fenlan.spring.shop.bean.Order;
 import com.fenlan.spring.shop.bean.Product;
 import com.fenlan.spring.shop.bean.Shop;
 import com.fenlan.spring.shop.bean.User;
+import org.aspectj.weaver.ast.Or;
+import org.omg.CORBA.DATA_CONVERSION;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +38,8 @@ public class SalesService {
     ProductDAO productDAO;
     @Autowired
     ShopDAO shopDAO;
+    @Autowired
+    AdService adService;
 
     private User authUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -129,5 +134,143 @@ public class SalesService {
             order.setUserName(user.getUsername());
         }
         return order;
+    }
+
+    public List<Double> salesSelector(Date date, String type) throws Exception{
+        if (type.equals("daily")){
+            return listSalesByDayTimes(date);
+        }else if (type.equals("weekly")){
+            return listSalesByWeekTimes(date);
+        }else if (type.equals("monthly")){
+            return listSalesByMonthTimes(date);
+        }else {
+            return listSalesByYearTimes(date);
+        }
+    }
+    /**
+     * 连续10days
+     * @param date
+     * @return
+     * @throws Exception
+     */
+    private List<Double> listSalesByDayTimes(Date date) throws Exception{
+        //date为当天
+        Shop shop = shopDAO.findByUser(authUser());
+        if (shop == null) throw new Exception("you are not sellers");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, -9);
+        Date tmp = calendar.getTime();
+        calendar.add(Calendar.DATE, 1);
+        List<Double> result = new LinkedList<>();
+        for (int i= 0;i < 10; i++){
+            List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndShopIdAndStatus(tmp,
+                    calendar.getTime(), shop.getId(), "Complete");
+            double sales = 0.0;
+            double payment = adService.findPayment(tmp, calendar.getTime());
+            for (Order order : orderList){
+                sales += order.getTotalPrice() - order.getCommission();
+            }
+            ((LinkedList<Double>) result).addLast(sales);
+            ((LinkedList<Double>) result).addLast(payment);
+            tmp = calendar.getTime();
+            calendar.add(Calendar.DATE, 1);
+        }
+        return result;
+    }
+
+    /**
+     * 连续10month
+     * @param date
+     * @return
+     * @throws Exception
+     */
+    private List<Double> listSalesByMonthTimes(Date date) throws Exception{
+        //date 为current month
+        Shop shop = shopDAO.findByUser(authUser());
+        if (shop == null) throw new Exception("you are not sellers");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        List<Double> result = new LinkedList<>();
+        calendar.add(Calendar.MONTH, -5);
+        Date tmp = calendar.getTime();
+        calendar.add(Calendar.MONTH, 1);
+        for (int i = 0;i < 6;i++){
+            List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndShopIdAndStatus(tmp,
+                    calendar.getTime(), shop.getId(), "Complete");
+            double sales = 0.0;
+            double payment = adService.findPayment(tmp, calendar.getTime());
+            for (Order order : orderList){
+                sales += order.getTotalPrice() - order.getCommission();
+            }
+            ((LinkedList<Double>) result).addLast(sales);
+            ((LinkedList<Double>) result).addLast(payment);
+            tmp = calendar.getTime();
+            calendar.add(Calendar.MONTH, 1);
+        }
+        return result;
+    }
+
+    /**
+     * 今年和前四年的销售额
+     * @param date
+     * @return
+     * @throws Exception
+     */
+    private List<Double> listSalesByYearTimes(Date date) throws Exception{
+        Shop shop = shopDAO.findByUser(authUser());
+        if (shop == null) throw new Exception("you are not sellers");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        List<Double> result = new LinkedList<>();
+        calendar.add(Calendar.YEAR, -4);
+        Date tmp = calendar.getTime();
+        calendar.add(Calendar.YEAR, 1);
+        for (int i = 0;i < 5;i++){
+            List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndShopIdAndStatus(tmp,
+                    calendar.getTime(), shop.getId(), "Complete");
+            double sales = 0.0;
+            double payment = adService.findPayment(tmp, calendar.getTime());
+            for (Order order : orderList){
+                sales += order.getTotalPrice() - order.getCommission();
+            }
+            ((LinkedList<Double>) result).addLast(sales);
+            ((LinkedList<Double>) result).addLast(payment);
+            tmp = calendar.getTime();
+            calendar.add(Calendar.YEAR, 1);
+        }
+        return result;
+    }
+
+    /**
+     * 本星期和前四星期的销售额
+     * @param date
+     * @return
+     * @throws Exception
+     */
+    private List<Double> listSalesByWeekTimes(Date date) throws Exception{
+        //一个星期的第一天Sunday
+        Shop shop = shopDAO.findByUser(authUser());
+        if (shop == null) throw new Exception("you are not sellers");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        List<Double> result = new LinkedList<>();
+        calendar.add(Calendar.DATE, -49);
+        Date tmp = calendar.getTime();
+        calendar.add(Calendar.DATE, 7);
+        for (int i = 0;i < 8;i++){
+            List<Order> orderList = orderDAO.findAllByCreateTimeBetweenAndShopIdAndStatus(tmp,
+                    calendar.getTime(), shop.getId(), "Complete");
+            double sales = 0.0;
+            double payment = adService.findPayment(tmp, calendar.getTime());
+            for (Order order : orderList){
+                sales += order.getTotalPrice() - order.getCommission();
+            }
+            ((LinkedList<Double>) result).addLast(sales);
+            ((LinkedList<Double>) result).addLast(payment);
+            tmp = calendar.getTime();
+            calendar.add(Calendar.DATE, 7);
+        }
+        return result;
     }
 }
