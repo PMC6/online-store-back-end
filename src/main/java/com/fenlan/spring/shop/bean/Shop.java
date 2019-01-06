@@ -21,7 +21,6 @@ public class Shop {
     private User user;
     @Column(columnDefinition = "TEXT")
     private String info;
-    @Column(columnDefinition = "TEXT")
     private String image;
     private String email;
     private String telephone;

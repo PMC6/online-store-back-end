@@ -24,7 +24,6 @@ public class AdRequest {
     private Shop shop;
     @CreatedDate
     private Date createTime;
-    @Column(columnDefinition = "TEXT")
     private String image;
     private RequestStatus status;
 

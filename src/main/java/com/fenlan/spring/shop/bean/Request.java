@@ -22,7 +22,6 @@ public class Request {
     @NotFound(action = NotFoundAction.IGNORE)
     private User user;
     private RequestStatus status;
-    @Column(columnDefinition = "TEXT")
     private String image;
     @Column(columnDefinition = "TEXT")
     private String info;

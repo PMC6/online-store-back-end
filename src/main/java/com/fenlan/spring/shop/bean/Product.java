@@ -24,7 +24,6 @@ public class Product {
     private String info;
     @ManyToOne(cascade = {CascadeType.MERGE},fetch = FetchType.EAGER)
     private Shop shop;
-    @Column(columnDefinition = "TEXT")
     private String image;
     private int number;
     private boolean homePage;
