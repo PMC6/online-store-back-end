@@ -45,11 +45,12 @@ public class ManageOrderController {
 
     /**
      * 商家更新订单状态
-     * @param orderId
      * @return
      */
     @PutMapping("/order/update")
-    public ResponseEntity<ResponseFormat> updateOrderStatus(@RequestParam("orderId") Long orderId){
+//    public ResponseEntity<ResponseFormat> updateOrderStatus(@RequestParam("orderId") Long orderId){
+    public ResponseEntity<ResponseFormat> updateOrderStatus(@RequestBody Map map){
+        Long orderId = Long.parseLong(map.get("orderId").toString());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         User user = userService.findByName(userName);
@@ -134,11 +135,11 @@ public class ManageOrderController {
 
     /**
      * 取消订单(卖家or买家)
-     * @param orderId
      * @return
      */
-    @PutMapping("/order/cancelOrder")
-    public ResponseEntity<ResponseFormat> cancelOrder(@RequestParam("orderId") Long orderId){
+    @PutMapping("/order/cancel")
+    public ResponseEntity<ResponseFormat> cancelOrder(@RequestBody Map map){
+        Long orderId = Long.parseLong(map.get("orderId").toString());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
         User user = userService.findByName(userName);
@@ -402,4 +403,26 @@ public class ManageOrderController {
         }
     }
 
+    /**
+     * 查看某个订单商品信息
+     * @return
+     */
+    @GetMapping("/order/findProductInfo")
+    public ResponseEntity<ResponseFormat> findInfo(@RequestParam("orderId") Long orderId){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("find success")
+                    .path(request.getServletPath())
+                    .data(orderService.findProductInfo(orderId))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("find failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

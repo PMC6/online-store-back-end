@@ -17,6 +17,7 @@ public interface OrderDAO extends JpaRepository<Order, Long> {
     int countAllByShopIdAndStatus(Long shopId, String status);
     int countAllByUserIdAndStatusNot(Long userId, String status);
     int countAllByUserIdAndStatus(Long userId, String status);
+    int countAllByUserIdAndStatusAndCreateTimeBetween(Long userId, String status, Date before, Date after);
     List<Order> findAllByProductIdAndStatusNot(Pageable pageable, Long productId, String status);
     int countAllByProductIdAndStatusNot(Long productId, String status);
     List<Order> findAllByCreateTimeBetweenAndStatus(Date before, Date after, String status);
@@ -27,10 +28,13 @@ public interface OrderDAO extends JpaRepository<Order, Long> {
                                                                 Long shopId, String status);
     List<Order> findAllByCreateTimeBetweenAndProductIdAndStatus(Date before, Date after,
                                                                 Long productId, String status);
+    List<Order> findAllByCreateTimeBetweenAndProductIdAndStatus(Pageable pageable, Date before, Date after,
+                                                                Long productId, String status);
     List<Order> findAllByCreateTimeBetweenAndShopIdAndStatus(Date before, Date after, Long shopId, String status);
     List<Order> findAllByCreateTimeBetweenAndUserIdAndStatus(Pageable pageable, Date before, Date after,
                                                                Long userID, String status);
     List<Order> findAllByUserIdAndStatus(Pageable pageable, Long userId, String status);
     List<Order> findAllByStatus(String status);
+    int countAllByCreateTimeBetweenAndProductIdAndStatus(Date before, Date after, Long productId, String status);
 
 }

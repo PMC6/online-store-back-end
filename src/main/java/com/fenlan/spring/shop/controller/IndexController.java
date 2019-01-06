@@ -40,6 +40,8 @@ public class IndexController {
     AdService adService;
     @Autowired
     ShopService shopService;
+    @Autowired
+    CommentService commentService;
 
     @GetMapping("")
     public ResponseEntity<ResponseFormat> index(Authentication auth) {
@@ -351,5 +353,29 @@ public class IndexController {
                 .path(request.getServletPath())
                 .data("http://39.98.165.19:8084/static/image/"+fileName)
                 .build(), HttpStatus.OK);
+    }
+
+    /**
+     * 查看商品评论
+     * @param productId
+     * @return
+     */
+    @GetMapping("/comment/list")
+    public ResponseEntity<ResponseFormat> listByProductId(@RequestParam("productId") Long productId){
+        try {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.OK.value())
+                    .error(null)
+                    .message("query success")
+                    .path(request.getServletPath())
+                    .data(commentService.listByProductId(productId))
+                    .build(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseFormat.Builder(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .error("query failed")
+                    .message(e.getLocalizedMessage())
+                    .path(request.getServletPath())
+                    .data(null)
+                    .build(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
